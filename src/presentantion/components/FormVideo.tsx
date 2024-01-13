@@ -123,6 +123,9 @@ export const FormVideo = ({ onClose, open }: FormVideoProps) => {
     if (!imageBase64) {
       return alert("La portada es obligatoria");
     }
+    if (!selectTag) {
+      return alert("La categoría es obligatoria");
+    }
     try {
       setLoading(true);
       const docData = {
@@ -133,6 +136,7 @@ export const FormVideo = ({ onClose, open }: FormVideoProps) => {
         attachment: [],
         videoUrl: await uploadFile(videoFile as File, "videos"),
         coverUrl: await uploadFile(imageBase64 as string, "images"),
+        tag: selectTag,
       };
       const citiesRef = collection(db, "videos");
       await setDoc(doc(citiesRef), docData);
