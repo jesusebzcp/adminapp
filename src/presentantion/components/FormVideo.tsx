@@ -24,6 +24,7 @@ import { db, ref, storage } from "@app/application/config/firebase";
 //@ts-ignore
 import uuid4 from "uuid4";
 import { getDownloadURL, uploadBytes, uploadString } from "firebase/storage";
+import { CloudUpload } from "@mui/icons-material";
 
 type FormVideoProps = {
   onClose(): void;
@@ -50,7 +51,7 @@ export const FormVideo = ({ onClose, open }: FormVideoProps) => {
   const [videoDuration, setVideoDuration] = useState<number | null>(null);
   const [videoLocalUrl, setVideoLocalUrl] = useState<string | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [imageBase64, setImageBase64] = useState("");
+  const [imageBase64, setImageBase64] = useState<File | string>("");
   const [selectTag, setSelectTag] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -77,6 +78,14 @@ export const FormVideo = ({ onClose, open }: FormVideoProps) => {
     },
   });
 
+  const handleImagenChange = (event: any) => {
+    const file = event.target.files[0];
+
+    if (file) {
+      setImageBase64(file);
+    }
+  };
+
   const handleChange = (event: SelectChangeEvent) => {
     setSelectTag(event.target.value as string);
   };
@@ -92,7 +101,28 @@ export const FormVideo = ({ onClose, open }: FormVideoProps) => {
     return fbFileUrl;
   };
 
+  const handleClose = () => {
+    setSelectTag("");
+    setImageBase64("");
+    setVideoFile(null);
+    setVideoLocalUrl(null);
+    setVideoLocalUrl(null);
+    setVideoDuration(null);
+    setDescription("");
+    setTitle("");
+    onClose();
+  };
+
   const onSubmit = async () => {
+    if (!title.trim()) {
+      return alert("El titulo es obligatorio");
+    }
+    if (!description.trim()) {
+      return alert("La descripción es obligatorio");
+    }
+    if (!imageBase64) {
+      return alert("La portada es obligatoria");
+    }
     try {
       setLoading(true);
       const docData = {
@@ -106,7 +136,7 @@ export const FormVideo = ({ onClose, open }: FormVideoProps) => {
       };
       const citiesRef = collection(db, "videos");
       await setDoc(doc(citiesRef), docData);
-      onClose();
+      handleClose();
     } catch (error) {
       console.log("onSubmit:error", error);
       alert("Ocurrió un error");
@@ -138,18 +168,50 @@ export const FormVideo = ({ onClose, open }: FormVideoProps) => {
             />
           </div>
           {imageBase64 && (
-            <>
-              <Typography>{"Portada"}</Typography>
+            <div
+              style={{
+                position: "relative",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  left: 0,
+                  bottom: 0,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Button
+                  component="label"
+                  variant="contained"
+                  startIcon={<CloudUpload />}
+                >
+                  Cambiar portada
+                  <VisuallyHiddenInput
+                    onChange={handleImagenChange}
+                    accept="image/*"
+                    type={"file"}
+                  />
+                </Button>
+              </div>
               <Image
                 style={{
                   borderRadius: 12,
                 }}
-                src={imageBase64}
+                src={
+                  typeof imageBase64 === "string"
+                    ? imageBase64
+                    : URL.createObjectURL(imageBase64)
+                }
                 width={550}
                 height={200}
                 alt={""}
               />
-            </>
+            </div>
           )}
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">
