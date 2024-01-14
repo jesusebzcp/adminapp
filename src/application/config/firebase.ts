@@ -1,7 +1,6 @@
 import { getApps, initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore/lite";
 import { getStorage, ref } from "firebase/storage";
-
 const firebaseConfig = {
   apiKey: "AIzaSyAM8ay8kNDSQflts1k9LmVwof1A_ywMR-E",
   authDomain: "supremefx-cbc26.firebaseapp.com",

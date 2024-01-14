@@ -1,4 +1,3 @@
-import { useAuth } from "@app/application/context/AuthContext";
 import {
   BottomNavigation,
   BottomNavigationAction,
@@ -16,20 +15,6 @@ export const MainLayout = ({ children }: any) => {
   const [value, setValue] = useState(0);
   const onChangePage = (page: number) => {
     setValue(page);
-    switch (page) {
-      case 0:
-        router.push("/");
-        return;
-      case 1:
-        router.push("/");
-      case 2:
-        router.push("/");
-        return;
-
-      default:
-        router.push("/");
-        break;
-    }
   };
   return (
     <div>
@@ -51,8 +36,16 @@ export const MainLayout = ({ children }: any) => {
             onChangePage(newValue);
           }}
         >
-          <BottomNavigationAction label="Videos" icon={<OndemandVideoIcon />} />
-          <BottomNavigationAction label="Señales" icon={<CellTowerIcon />} />
+          <BottomNavigationAction
+            onClick={() => router.push("/")}
+            label="Videos"
+            icon={<OndemandVideoIcon />}
+          />
+          <BottomNavigationAction
+            onClick={() => router.push("/signals")}
+            label="Señales"
+            icon={<CellTowerIcon />}
+          />
           <BottomNavigationAction label="Noticias" icon={<NewspaperIcon />} />
         </BottomNavigation>
       </Paper>
