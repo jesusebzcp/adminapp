@@ -10,11 +10,11 @@ import { Button } from "@mui/material";
 import { useSignals } from "@app/application/feature/useSignals";
 
 export function TableSignals() {
-  const { signals } = useSignals();
+  const { signals, getVideos } = useSignals();
 
   return (
     <TableContainer component={Paper}>
-      <Button onClick={() => {}}> {"Recargar"}</Button>
+      <Button onClick={getVideos}> {"Recargar"}</Button>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>

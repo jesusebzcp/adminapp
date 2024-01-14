@@ -49,7 +49,6 @@ const typeStatus = ["Activa", "Pendiente", "Descartada"];
 export const initialState = {
   defaultCurrency: "",
   currency: "",
-  order: "",
   comment: "",
   action: "",
   entryPrice: "",
@@ -63,7 +62,7 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
   const [values, setValues] = useState(initialState);
   const [inputValue1, setInputValue1] = React.useState("");
   const [inputValue2, setInputValue2] = React.useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [optionsPar, setOptionsPar] = useState<CurrencyInfo[]>([]);
   const [imageBase64, setImageBase64] = useState<File>();
 
@@ -109,6 +108,7 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
     }
   };
   const handleFormSubmit = async () => {
+    console.log("FormSignal", values);
     setLoading(true);
 
     // Validate form data
@@ -124,7 +124,7 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
     }
     try {
       const docData = {
-        ...initialState,
+        ...values,
         date: Timestamp.fromDate(new Date()),
         graphImage: await uploadFile(imageBase64, "graph"),
       };
@@ -133,6 +133,8 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
       await setDoc(doc(citiesRef), docData);
 
       onClose();
+      setValues(initialState);
+      setImageBase64(undefined);
     } catch (error) {
       alert("Ocurrió un error al crear la señal");
     } finally {
@@ -259,10 +261,10 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
             <Select
               labelId="demo-simple-select-label"
               id="demo-simple-select"
-              value={values.order}
+              value={values.orderType}
               label="Tipo de orden"
               onChange={(e: SelectChangeEvent) =>
-                onChange("order", e.target.value)
+                onChange("orderType", e.target.value)
               }
             >
               {typeOrder.map((order) => {
