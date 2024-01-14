@@ -1,4 +1,3 @@
-import { useSignals } from "@app/application/feature/useSignals";
 import { FormSignal } from "@app/presentantion/components/FormSignal";
 import { TableSignals } from "@app/presentantion/components/TableSignals";
 import { SignalCellular1Bar } from "@mui/icons-material";
