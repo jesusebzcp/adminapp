@@ -23,6 +23,7 @@ import axios from "axios";
 import { collection, doc, setDoc, Timestamp } from "firebase/firestore/lite";
 import Image from "next/image";
 import React, { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
   clipPath: "inset(50%)",
@@ -38,11 +39,6 @@ type FormSignalProps = {
   onClose(): void;
   open: boolean;
 };
-
-interface CurrencyInfo {
-  value: string;
-  label: string;
-}
 
 const typeOrder = ["Sell Stop", "Buy Stop", "Sell Limit", "Buy Limit"];
 export const typeStatus = ["Activa", "Pendiente", "Descartada"];
@@ -65,7 +61,7 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
   const [inputValue1, setInputValue1] = React.useState("");
   const [inputValue2, setInputValue2] = React.useState("");
   const [loading, setLoading] = useState(false);
-  const [optionsPar, setOptionsPar] = useState<CurrencyInfo[]>([]);
+  const [optionsPar, setOptionsPar] = useState<string[]>([]);
   const [imageBase64, setImageBase64] = useState<File>();
 
   const API_KEY = "bb7198cffae84be481edc53f5e52fb3e";
@@ -82,16 +78,16 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
         url: `https://api.currencyfreaks.com/v2.0/rates/latest?apikey=${API_KEY}`,
       });
       const ratesArray = Object.keys(response.data.rates);
-      const arrayFormate: CurrencyInfo[] = [];
+      const arrayFormate: string[] = [];
 
       ratesArray.map((current) => {
         if (current !== values.defaultCurrency) {
-          arrayFormate.push({ label: current, value: current });
+          arrayFormate.push(current);
         }
       });
       setOptionsPar(arrayFormate);
     } catch (error) {
-      alert("Ocurrió un error al traer la lista de monedas");
+      toast("Ocurrió un error al traer la lista de monedas");
     } finally {
       setLoading(false);
     }
@@ -112,20 +108,20 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
     }
   };
   const handleFormSubmit = async () => {
-    setLoading(true);
-
     // Validate form data
     const isValidForm = validateForm();
 
     if (!isValidForm) {
       // If the form is not valid, you can display an error message or perform other actions
-      alert("Por favor, complete todos los campos correctamente.");
+      toast("Por favor, complete todos los campos correctamente.");
       return;
     }
     if (!imageBase64) {
-      return alert("La imagen es obligatoria");
+      return toast("La imagen es obligatoria");
     }
     try {
+      setLoading(true);
+
       const docData = {
         ...values,
         date: Timestamp.fromDate(new Date()),
@@ -139,7 +135,7 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
       setValues(initialState);
       setImageBase64(undefined);
     } catch (error) {
-      alert("Ocurrió un error al crear la señal");
+      toast("Ocurrió un error al crear la señal");
     } finally {
       setLoading(false);
     }
@@ -199,32 +195,23 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
           >
             <Autocomplete
               fullWidth
-              value={{
-                label: values.defaultCurrency,
-                value: values.defaultCurrency,
-              }}
+              value={values.defaultCurrency}
               onChange={(event: any, newValue) => {
-                onChange("defaultCurrency", newValue?.value || "");
+                onChange("defaultCurrency", newValue || "");
               }}
               inputValue={inputValue1}
               onInputChange={(event, newInputValue) => {
                 setInputValue1(newInputValue);
-              }}
-              getOptionLabel={(option) => {
-                return option.label;
               }}
               id="controllable-states-demo"
               options={optionsPar}
               renderInput={(params) => (
                 <TextField {...params} label="Moneda1" />
               )}
-              isOptionEqualToValue={(option, value): boolean => {
-                return option.value === value.value;
-              }}
-              renderOption={(props, option: CurrencyInfo) => {
+              renderOption={(props, option: string) => {
                 return (
-                  <li {...props} key={option.value}>
-                    {option.label}
+                  <li {...props} key={option}>
+                    {option}
                   </li>
                 );
               }}
@@ -232,36 +219,27 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
             <Typography mx={2}>{"/"}</Typography>
             <Autocomplete
               fullWidth
-              value={{
-                label: values.currency,
-                value: values.currency,
-              }}
+              value={values.currency}
               onChange={(event: any, newValue) => {
-                onChange("currency", newValue?.value || "");
+                onChange("currency", newValue || "");
               }}
               inputValue={inputValue2}
               onInputChange={(event, newInputValue) => {
                 setInputValue2(newInputValue);
-              }}
-              getOptionLabel={(option) => {
-                return option.label;
               }}
               id="controllable-states-demo"
               options={optionsPar}
               renderInput={(params) => (
                 <TextField {...params} label="Moneda2" />
               )}
-              isOptionEqualToValue={(option, value): boolean => {
-                return option.value === value.value;
-              }}
-              renderOption={(props, option: CurrencyInfo) => {
+              renderOption={(props, option: string) => {
                 return (
-                  <li {...props} key={option.value}>
-                    {option.label}
+                  <li {...props} key={option}>
+                    {option}
                   </li>
                 );
               }}
-            />{" "}
+            />
           </Box>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Tipo de orden</InputLabel>

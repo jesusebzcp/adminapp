@@ -8,6 +8,7 @@ import { theme } from "@app/application/config/theme";
 import { AuthProvider } from "@app/application/context/AuthContext";
 import { AuthLayout } from "@app/presentantion/layout/AuthLayout";
 import { MainLayout } from "@app/presentantion/layout/MainLayout";
+import { Toaster } from "sonner";
 
 export default function MyApp(props: AppProps) {
   const { Component, pageProps } = props;
@@ -17,6 +18,7 @@ export default function MyApp(props: AppProps) {
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
       <ThemeProvider theme={theme}>
+        <Toaster />
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
         <AuthProvider>
