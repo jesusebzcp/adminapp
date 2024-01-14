@@ -17,6 +17,7 @@ import {
   styled,
   TextField,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import axios from "axios";
 import { collection, doc, setDoc, Timestamp } from "firebase/firestore/lite";
@@ -44,7 +45,7 @@ interface CurrencyInfo {
 }
 
 const typeOrder = ["Sell Stop", "Buy Stop", "Sell Limit", "Buy Limit"];
-const typeStatus = ["Activa", "Pendiente", "Descartada"];
+export const typeStatus = ["Activa", "Pendiente", "Descartada"];
 
 export const initialState = {
   defaultCurrency: "",
@@ -59,6 +60,7 @@ export const initialState = {
   status: "Activa",
 };
 export const FormSignal = ({ onClose, open }: FormSignalProps) => {
+  const matches = useMediaQuery("(min-width:600px)");
   const [values, setValues] = useState(initialState);
   const [inputValue1, setInputValue1] = React.useState("");
   const [inputValue2, setInputValue2] = React.useState("");
@@ -72,6 +74,8 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
     setValues((prev) => ({ ...prev, [name]: value }));
   };
   const fetchCurrencyPair = useCallback(async () => {
+    setLoading(true);
+
     try {
       const response = await axios({
         method: "get",
@@ -108,7 +112,6 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
     }
   };
   const handleFormSubmit = async () => {
-    console.log("FormSignal", values);
     setLoading(true);
 
     // Validate form data
@@ -155,7 +158,7 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
   }
   return (
     <Dialog onClose={onClose} open={open}>
-      <DialogTitle>Creador de videos</DialogTitle>
+      <DialogTitle>Creador de señales</DialogTitle>
       <DialogContent>
         {imageBase64 && (
           <Image
@@ -181,7 +184,11 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
 
         <Box my={2} />
 
-        <Box width={500}>
+        <Box
+          {...(matches && {
+            width: 500,
+          })}
+        >
           <Box
             sx={{
               flexDirection: "row",

@@ -6,15 +6,36 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Button } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from "@mui/material";
 import { useSignals } from "@app/application/feature/useSignals";
+import { typeStatus } from "./FormSignal";
+import { doc, updateDoc } from "firebase/firestore/lite";
+import { db } from "@app/application/config/firebase";
 
 export function TableSignals() {
-  const { signals, getVideos } = useSignals();
+  const { signals, getSignals, onDelete } = useSignals();
+
+  const onChangeStatus = async (status: string, id: string) => {
+    try {
+      await updateDoc(doc(db, "Signals", id), {
+        status: status,
+      });
+      getSignals();
+    } catch (error) {
+      alert("Ocurrió un error al actualizar la señal");
+    }
+  };
 
   return (
     <TableContainer component={Paper}>
-      <Button onClick={getVideos}> {"Recargar"}</Button>
+      <Button onClick={getSignals}> {"Recargar"}</Button>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
@@ -27,6 +48,7 @@ export function TableSignals() {
             <TableCell align="right">Take profit</TableCell>
             <TableCell align="right">Stop loss</TableCell>
             <TableCell align="right">Estado</TableCell>
+            <TableCell align="right">Opciones</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -43,7 +65,35 @@ export function TableSignals() {
               <TableCell align="right">{signal.orderType}</TableCell>
               <TableCell align="right">{signal.takeProfit}</TableCell>
               <TableCell align="right">{signal.stopLoss}</TableCell>
-              <TableCell align="right">{signal.status}</TableCell>
+              <TableCell align="right">
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">
+                    Estado de la señal
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={signal.status}
+                    label="Estado de señal"
+                    onChange={(e: SelectChangeEvent) =>
+                      onChangeStatus(e.target.value, signal.id)
+                    }
+                  >
+                    {typeStatus.map((stats) => {
+                      return (
+                        <MenuItem key={stats} value={stats}>
+                          {stats}
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                </FormControl>
+              </TableCell>
+              <TableCell align="right">
+                <Button color="error" onClick={() => onDelete(signal.id)}>
+                  {"Eliminar"}
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
