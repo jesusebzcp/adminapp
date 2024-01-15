@@ -132,8 +132,8 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
       await setDoc(doc(citiesRef), docData);
 
       await axios.post("/api/sendNotification", {
-        title: "Nueva señal",
-        body: "Body",
+        title: "Hola 👋",
+        body: "Tenemos un nuevo Código signal para ti. ",
         topic: "client",
       });
 
