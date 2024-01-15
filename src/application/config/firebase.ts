@@ -2,13 +2,13 @@ import { getApps, initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore/lite";
 import { getStorage, ref } from "firebase/storage";
 const firebaseConfig = {
-  apiKey: "AIzaSyAM8ay8kNDSQflts1k9LmVwof1A_ywMR-E",
-  authDomain: "supremefx-cbc26.firebaseapp.com",
-  projectId: "supremefx-cbc26",
-  storageBucket: "supremefx-cbc26.appspot.com",
-  messagingSenderId: "697073001382",
-  appId: "1:697073001382:web:408a50263c58cc7597a567",
-  measurementId: "G-FWD6WE2DD1",
+  apiKey: process.env.NEXT_PUBLIC_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_MS,
+  appId: process.env.NEXT_PUBLIC_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID,
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];

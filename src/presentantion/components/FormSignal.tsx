@@ -131,10 +131,17 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
 
       await setDoc(doc(citiesRef), docData);
 
+      await axios.post("/api/sendNotification", {
+        title: "Nueva señal",
+        body: "Body",
+        topic: "client",
+      });
+
       onClose();
       setValues(initialState);
       setImageBase64(undefined);
     } catch (error) {
+      console.log("error", error);
       toast("Ocurrió un error al crear la señal");
     } finally {
       setLoading(false);
