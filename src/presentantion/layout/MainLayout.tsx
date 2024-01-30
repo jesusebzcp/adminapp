@@ -9,6 +9,7 @@ import OndemandVideoIcon from "@mui/icons-material/OndemandVideo";
 import CellTowerIcon from "@mui/icons-material/CellTower";
 import NewspaperIcon from "@mui/icons-material/Newspaper";
 import { useRouter } from "next/router";
+import PaidIcon from "@mui/icons-material/Paid";
 
 export const MainLayout = ({ children }: any) => {
   const router = useRouter();
@@ -42,11 +43,11 @@ export const MainLayout = ({ children }: any) => {
             icon={<OndemandVideoIcon />}
           />
           <BottomNavigationAction
-            onClick={() => router.push("/signals")}
+            onClick={() => router.push("/subscription")}
             label="Señales"
             icon={<CellTowerIcon />}
           />
-          <BottomNavigationAction label="Noticias" icon={<NewspaperIcon />} />
+          <BottomNavigationAction label="Suscripciones" icon={<PaidIcon />} />
         </BottomNavigation>
       </Paper>
     </div>
