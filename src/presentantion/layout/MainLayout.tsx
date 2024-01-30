@@ -43,11 +43,15 @@ export const MainLayout = ({ children }: any) => {
             icon={<OndemandVideoIcon />}
           />
           <BottomNavigationAction
-            onClick={() => router.push("/subscription")}
+            onClick={() => router.push("/signals")}
             label="Señales"
             icon={<CellTowerIcon />}
           />
-          <BottomNavigationAction label="Suscripciones" icon={<PaidIcon />} />
+          <BottomNavigationAction
+            onClick={() => router.push("/subscription")}
+            label="Suscripciones"
+            icon={<PaidIcon />}
+          />
         </BottomNavigation>
       </Paper>
     </div>

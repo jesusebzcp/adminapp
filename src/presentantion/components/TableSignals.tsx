@@ -16,8 +16,9 @@ import {
 } from "@mui/material";
 import { useSignals } from "@app/application/feature/useSignals";
 import { typeStatus } from "./FormSignal";
-import { doc, updateDoc } from "firebase/firestore/lite";
+import { collection, doc, setDoc, updateDoc } from "firebase/firestore/lite";
 import { db } from "@app/application/config/firebase";
+import axios from "axios";
 
 export function TableSignals() {
   const { signals, getSignals, onDelete } = useSignals();
@@ -26,6 +27,21 @@ export function TableSignals() {
     try {
       await updateDoc(doc(db, "Signals", id), {
         status: status,
+      });
+      const not = {
+        title: "Hola 👋",
+        body: "🚨 Actualizamos un Código signal para ti",
+        topic: "client",
+      };
+      const notificationRef = collection(db, "notifications");
+
+      await axios.post("/api/sendNotification", not);
+      await setDoc(doc(notificationRef), {
+        title: not.title,
+        body: not.body,
+        type: "signal",
+        date: new Date(),
+        id: id,
       });
       getSignals();
     } catch (error) {

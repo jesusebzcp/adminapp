@@ -20,7 +20,13 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import axios from "axios";
-import { collection, doc, setDoc, Timestamp } from "firebase/firestore/lite";
+import {
+  addDoc,
+  collection,
+  doc,
+  setDoc,
+  Timestamp,
+} from "firebase/firestore/lite";
 import Image from "next/image";
 import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -127,14 +133,24 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
         date: Timestamp.fromDate(new Date()),
         graphImage: await uploadFile(imageBase64, "graph"),
       };
-      const citiesRef = collection(db, "Signals");
+      const signalRef = collection(db, "Signals");
+      const notificationRef = collection(db, "notifications");
 
-      await setDoc(doc(citiesRef), docData);
-
-      await axios.post("/api/sendNotification", {
+      const docCrate = await addDoc(signalRef, docData);
+      const not = {
         title: "Hola 👋",
-        body: "Tenemos un nuevo Código signal para ti. ",
+        body: "Tenemos un nuevo Código signal para ti.",
         topic: "client",
+      };
+
+      await axios.post("/api/sendNotification", not);
+
+      await setDoc(doc(notificationRef), {
+        title: not.title,
+        body: not.body,
+        type: "signal",
+        date: new Date(),
+        id: docCrate.id,
       });
 
       onClose();
