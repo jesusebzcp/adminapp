@@ -13,7 +13,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
 //@ts-ignore
 import VideoThumbnail from "react-video-thumbnail";
@@ -25,6 +25,7 @@ import { db, ref, storage } from "@app/application/config/firebase";
 import uuid4 from "uuid4";
 import { getDownloadURL, uploadBytes, uploadString } from "firebase/storage";
 import { CloudUpload } from "@mui/icons-material";
+import axios from "axios";
 
 type FormVideoProps = {
   onClose(): void;
@@ -140,6 +141,12 @@ export const FormVideo = ({ onClose, open }: FormVideoProps) => {
       };
       const citiesRef = collection(db, "videos");
       await setDoc(doc(citiesRef), docData);
+      const not = {
+        title: "Hola, Tenemos un nuevo video para ti.",
+        body: "",
+        topic: "client",
+      };
+      await axios.post("/api/sendNotification", not);
       handleClose();
     } catch (error) {
       console.log("onSubmit:error", error);

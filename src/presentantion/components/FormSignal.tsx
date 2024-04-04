@@ -138,8 +138,8 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
 
       const docCrate = await addDoc(signalRef, docData);
       const not = {
-        title: "Hola 👋",
-        body: "Tenemos un nuevo Código signal para ti.",
+        title: `Tenemos un nuevo análisis para ti ${values.defaultCurrency}/${values.currency}`,
+        body: "🚀",
         topic: "client",
       };
 

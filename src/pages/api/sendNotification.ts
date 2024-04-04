@@ -15,7 +15,6 @@ const sendNotification = async (
         body: req.body.body,
       },
     });
-    console.log("Se envio");
     res.status(200).json({ message: "Se envio" });
   } catch (error) {
     console.log("error", error);

@@ -23,14 +23,14 @@ import axios from "axios";
 export function TableSignals() {
   const { signals, getSignals, onDelete } = useSignals();
 
-  const onChangeStatus = async (status: string, id: string) => {
+  const onChangeStatus = async (status: string, signal: any) => {
     try {
-      await updateDoc(doc(db, "Signals", id), {
+      await updateDoc(doc(db, "Signals", signal.id), {
         status: status,
       });
       const not = {
         title: "Hola 👋",
-        body: "🚨 Actualizamos un Código signal para ti",
+        body: `Análisis actualizado ${signal.defaultCurrency}/${signal.currency}`,
         topic: "client",
       };
       const notificationRef = collection(db, "notifications");
@@ -41,7 +41,7 @@ export function TableSignals() {
         body: not.body,
         type: "signal",
         date: new Date(),
-        id: id,
+        id: signal.id,
       });
       getSignals();
     } catch (error) {
@@ -92,7 +92,7 @@ export function TableSignals() {
                     value={signal.status}
                     label="Estado de señal"
                     onChange={(e: SelectChangeEvent) =>
-                      onChangeStatus(e.target.value, signal.id)
+                      onChangeStatus(e.target.value, signal)
                     }
                   >
                     {typeStatus.map((stats) => {

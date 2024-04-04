@@ -1,5 +1,6 @@
-import { collection, getDocs } from "firebase/firestore/lite";
+import { collection, deleteDoc, doc, getDocs } from "firebase/firestore/lite";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { db } from "../config/firebase";
 
 export type VideoDocument = {
@@ -18,6 +19,7 @@ export type VideoDocument = {
 
 export const useVideos = () => {
   const [videos, setVideos] = useState<VideoDocument[]>([]);
+
   async function getVideos() {
     try {
       const videosCol = collection(db, "videos");
@@ -31,11 +33,22 @@ export const useVideos = () => {
       console.log("Error", error);
     }
   }
+
+  const handleDeleteVideo = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, "videos", id));
+      await getVideos();
+      toast.success("Se a eliminado el video con éxito.");
+    } catch (error) {
+      alert("Ocurrió un error al eliminar la señal");
+    }
+  };
   useEffect(() => {
     getVideos();
   }, []);
   return {
     videos,
     getVideos,
+    handleDeleteVideo,
   };
 };
