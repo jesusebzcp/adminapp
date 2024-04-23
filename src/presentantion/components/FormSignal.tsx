@@ -70,7 +70,7 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
   const [optionsPar, setOptionsPar] = useState<string[]>([]);
   const [imageBase64, setImageBase64] = useState<File>();
 
-  const API_KEY = "bb7198cffae84be481edc53f5e52fb3e";
+  const API_KEY = "bd66f040247f44dab9fe1f80a4f00999";
 
   const onChange = (name: keyof typeof initialState, value: string) => {
     setValues((prev) => ({ ...prev, [name]: value }));
