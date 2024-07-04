@@ -16,9 +16,11 @@ import * as XLSX from "xlsx";
 
 export function TableSubscription() {
   const [subscriptions, setSubscriptions] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
 
   async function getSubscription() {
     try {
+      setLoading(true);
       const videosCol = collection(db, "subscription");
       const subscriptionSnapshot = await getDocs(videosCol);
       const subscriptionList: any = subscriptionSnapshot.docs.map((doc) => ({
@@ -29,6 +31,8 @@ export function TableSubscription() {
       setSubscriptions(subscriptionList);
     } catch (error) {
       toast.error("Error en descargar las suscripciones");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -61,6 +65,24 @@ export function TableSubscription() {
 
   return (
     <TableContainer component={Paper}>
+      {loading && (
+        <div
+          style={{
+            position: "absolute",
+            right: 0,
+            left: 0,
+            bottom: 0,
+            top: 0,
+            background: "white",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 99,
+          }}
+        >
+          <h1>{"Cargando y actualizando las suscripciones"}</h1>
+        </div>
+      )}
       <Button variant="outlined" endIcon={<Download />} onClick={downloadPage}>
         Descargar suscripciones
       </Button>
