@@ -132,7 +132,7 @@ export const FormVideo = ({ onClose, open }: FormVideoProps) => {
       const docData = {
         title,
         description,
-        create: Timestamp.fromDate(new Date("December 10, 1815")),
+        create: Timestamp.fromDate(new Date()),
         comments: [],
         attachment: [],
         videoUrl: await uploadFile(videoFile as File, "videos"),
