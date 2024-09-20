@@ -60,6 +60,7 @@ export const initialState = {
   stopLoss: "",
   takeProfit: "",
   status: "Activa",
+  author: "Miguel Gaitan",
 };
 export const FormSignal = ({ onClose, open }: FormSignalProps) => {
   const matches = useMediaQuery("(min-width:600px)");
@@ -353,6 +354,12 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
             label="Comentario"
             value={values.comment}
             onChange={(e) => onChange("comment", e.target.value)}
+          />
+          <TextField
+            fullWidth
+            label="Author"
+            value={values.author}
+            onChange={(e) => onChange("author", e.target.value)}
           />
         </Box>
       </DialogContent>
