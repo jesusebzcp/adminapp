@@ -14,6 +14,24 @@ const sendNotification = async (
         title: req.body.title,
         body: req.body.body,
       },
+      // ✅ Configuración para ANDROID (Sonido + Alta Prioridad)
+      android: {
+        priority: 'high',
+        notification: {
+            sound: 'default',
+            channelId: 'default',
+            defaultSound: true,
+            priority: 'high'
+        }
+      },
+      // ✅ Configuración para iOS (Sonido)
+      apns: {
+        payload: {
+            aps: {
+                sound: 'default',
+            }
+        }
+      }
     });
     res.status(200).json({ message: "Se envio" });
   } catch (error) {
