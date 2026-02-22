@@ -219,9 +219,7 @@ export const FormSignal = ({ onClose, open, initialData }: FormSignalProps) => {
             options={[
               "NAS100", "SPX500", "XAU/USD", "EUR/USD", "GBP/USD", "AUD/USD", "NZD/USD",
               "USD/JPY", "USD/CAD", "USD/CHF", "GBP/CHF", "EUR/GBP", "GBP/JPY", "EUR/CAD",
-              "EUR/JPY", "AUD/CHF", "EUR/NZD", "CAD/CHF", "GBP/CAD", "GBP/AUD",
-              "Micro S&P 500 (MES)", "Micro Nasdaq (MNQ)", "Micro Gold (MGC)",
-              "S&P 500 (ES)", "Nasdaq (NQ)", "Gold (GC)"
+              "EUR/JPY", "AUD/CHF", "EUR/NZD", "CAD/CHF", "GBP/CAD", "GBP/AUD"
             ]}
             value={values.assetInput || null}
             onChange={(_, newValue) => onChange("assetInput", newValue || "")}
