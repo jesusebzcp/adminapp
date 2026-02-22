@@ -25,6 +25,7 @@ import {
   collection,
   doc,
   setDoc,
+  updateDoc,
   Timestamp,
 } from "firebase/firestore/lite";
 import Image from "next/image";
@@ -44,61 +45,41 @@ const VisuallyHiddenInput = styled("input")({
 type FormSignalProps = {
   onClose(): void;
   open: boolean;
+  initialData?: typeof initialState & { id?: string; image?: string; graphImage?: string };
 };
 
 const typeOrder = ["Sell Stop", "Buy Stop", "Sell Limit", "Buy Limit"];
 export const typeStatus = ["Activa", "Pendiente", "Descartada"];
 
 export const initialState = {
-  defaultCurrency: "",
-  currency: "",
+  assetInput: "",
   comment: "",
   action: "",
   entryPrice: "",
   orderType: "",
   relativeRisk: "",
   stopLoss: "",
+  stopLossPips: "",
   takeProfit: "",
   status: "Activa",
-  author: "Miguel Gaitan",
 };
-export const FormSignal = ({ onClose, open }: FormSignalProps) => {
+export const FormSignal = ({ onClose, open, initialData }: FormSignalProps) => {
   const matches = useMediaQuery("(min-width:600px)");
-  const [values, setValues] = useState(initialState);
-  const [inputValue1, setInputValue1] = React.useState("");
-  const [inputValue2, setInputValue2] = React.useState("");
+  const [values, setValues] = useState(initialData || initialState);
   const [loading, setLoading] = useState(false);
-  const [optionsPar, setOptionsPar] = useState<string[]>([]);
   const [imageBase64, setImageBase64] = useState<File>();
 
-  const API_KEY = "bd66f040247f44dab9fe1f80a4f00999";
+  // UseEffect to reset or pre-fill form when opened
+  useEffect(() => {
+    if (open) {
+      setValues(initialData || initialState);
+      setImageBase64(undefined);
+    }
+  }, [open, initialData]);
 
   const onChange = (name: keyof typeof initialState, value: string) => {
     setValues((prev) => ({ ...prev, [name]: value }));
   };
-  const fetchCurrencyPair = useCallback(async () => {
-    setLoading(true);
-
-    try {
-      const response = await axios({
-        method: "get",
-        url: `https://api.currencyfreaks.com/v2.0/rates/latest?apikey=${API_KEY}`,
-      });
-      const ratesArray = Object.keys(response.data.rates);
-      const arrayFormate: string[] = [];
-
-      ratesArray.map((current) => {
-        if (current !== values.defaultCurrency) {
-          arrayFormate.push(current);
-        }
-      });
-      setOptionsPar(arrayFormate);
-    } catch (error) {
-      toast("Ocurrió un error al traer la lista de monedas");
-    } finally {
-      setLoading(false);
-    }
-  }, [values.defaultCurrency]);
 
   const validateForm = () => {
     const areAllFieldsValid = Object.values(values).every(
@@ -119,40 +100,74 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
     const isValidForm = validateForm();
 
     if (!isValidForm) {
-      // If the form is not valid, you can display an error message or perform other actions
       toast("Por favor, complete todos los campos correctamente.");
       return;
     }
-    if (!imageBase64) {
+    // Only require image on creation. On edit, if image is omitted, keep the old one.
+    if (!imageBase64 && !initialData?.id) {
       return toast("La imagen es obligatoria");
     }
     try {
       setLoading(true);
 
-      const docData = {
-        ...values,
-        date: Timestamp.fromDate(new Date()),
-        graphImage: await uploadFile(imageBase64, "graph"),
+      const hasSlash = values.assetInput.includes('/');
+      const [base, quote] = hasSlash
+        ? values.assetInput.split('/')
+        : [values.assetInput, ""];
+
+      const docData: any = {
+        defaultCurrency: base.trim(),
+        currency: quote ? quote.trim() : "",
+        comment: values.comment,
+        action: values.action,
+        entryPrice: values.entryPrice,
+        orderType: values.orderType,
+        relativeRisk: values.relativeRisk,
+        stopLoss: values.stopLoss,
+        stopLossPips: values.stopLossPips,
+        takeProfit: values.takeProfit,
+        status: values.status,
       };
+
+      // Only parse new image if uploaded
+      if (imageBase64) {
+        docData.graphImage = await uploadFile(imageBase64, "graph");
+      }
+
       const signalRef = collection(db, "Signals");
       const notificationRef = collection(db, "notifications");
 
-      const docCrate = await addDoc(signalRef, docData);
-      const not = {
-        title: `Tenemos un nuevo análisis para ti ${values.defaultCurrency}/${values.currency}`,
-        body: "🚀",
-        topic: "client",
-      };
+      let finalId = "";
+      if (initialData?.id) {
+        // Edit Mode
+        await updateDoc(doc(db, "Signals", initialData.id), docData);
+        finalId = initialData.id;
+        toast("Señal actualizada correctamente");
+      } else {
+        // Creation Mode
+        docData.date = Timestamp.fromDate(new Date());
+        const docCrate = await addDoc(signalRef, docData);
+        finalId = docCrate.id;
+        toast("Señal creada correctamente");
+      }
 
-      await axios.post("/api/sendNotification", not);
-
-      await setDoc(doc(notificationRef), {
-        title: not.title,
-        body: not.body,
-        type: "signal",
-        date: new Date(),
-        id: docCrate.id,
-      });
+      // If we are creating, send notification (or if desired on edit)
+      if (!initialData?.id) {
+        const titleSymbol = docData.currency ? `${docData.defaultCurrency}/${docData.currency}` : docData.defaultCurrency;
+        const not = {
+          title: `Tenemos un nuevo análisis para ti ${titleSymbol}`,
+          body: "🚀",
+          topic: "client",
+        };
+        await axios.post("/api/sendNotification", not);
+        await setDoc(doc(notificationRef, finalId), {
+          title: not.title,
+          body: not.body,
+          type: "signal",
+          date: new Date(),
+          id: finalId,
+        });
+      }
 
       onClose();
       setValues(initialState);
@@ -165,9 +180,7 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
     }
   };
 
-  useEffect(() => {
-    fetchCurrencyPair();
-  }, [fetchCurrencyPair]);
+
 
   if (loading) {
     return (
@@ -178,93 +191,36 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
   }
   return (
     <Dialog onClose={onClose} open={open}>
-      <DialogTitle>Creador de señales</DialogTitle>
+      <DialogTitle>{initialData?.id ? 'Editar Señal' : 'Creador de señales'}</DialogTitle>
       <DialogContent>
-        {imageBase64 && (
+        {imageBase64 ? (
           <Image
             width={200}
             height={200}
             src={URL.createObjectURL(imageBase64)}
             alt={""}
           />
-        )}
-        <Button
-          fullWidth
-          component="label"
-          variant="contained"
-          startIcon={<CloudUpload />}
-        >
-          Subir gráfica
-          <VisuallyHiddenInput
-            onChange={handleImagenChange}
-            accept="image/*"
-            type={"file"}
+        ) : initialData?.graphImage || initialData?.image ? (
+          <Image
+            width={200}
+            height={200}
+            src={initialData.graphImage || initialData.image || ""}
+            alt={"Previous"}
           />
-        </Button>
-
-        <Box my={2} />
-
+        ) : null}
         <Box
           {...(matches && {
             width: 500,
           })}
+          sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 2, mb: 2 }}
         >
-          <Box
-            sx={{
-              flexDirection: "row",
-              display: "flex",
-              alignItems: "center",
-            }}
-            mb={2}
-          >
-            <Autocomplete
-              fullWidth
-              value={values.defaultCurrency}
-              onChange={(event: any, newValue) => {
-                onChange("defaultCurrency", newValue || "");
-              }}
-              inputValue={inputValue1}
-              onInputChange={(event, newInputValue) => {
-                setInputValue1(newInputValue);
-              }}
-              id="controllable-states-demo"
-              options={optionsPar}
-              renderInput={(params) => (
-                <TextField {...params} label="Moneda1" />
-              )}
-              renderOption={(props, option: string) => {
-                return (
-                  <li {...props} key={option}>
-                    {option}
-                  </li>
-                );
-              }}
-            />
-            <Typography mx={2}>{"/"}</Typography>
-            <Autocomplete
-              fullWidth
-              value={values.currency}
-              onChange={(event: any, newValue) => {
-                onChange("currency", newValue || "");
-              }}
-              inputValue={inputValue2}
-              onInputChange={(event, newInputValue) => {
-                setInputValue2(newInputValue);
-              }}
-              id="controllable-states-demo"
-              options={optionsPar}
-              renderInput={(params) => (
-                <TextField {...params} label="Moneda2" />
-              )}
-              renderOption={(props, option: string) => {
-                return (
-                  <li {...props} key={option}>
-                    {option}
-                  </li>
-                );
-              }}
-            />
-          </Box>
+          <TextField
+            fullWidth
+            label="Activo (Ej: EUR/USD o Nasdaq)"
+            value={values.assetInput}
+            onChange={(e) => onChange("assetInput", e.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Tipo de orden</InputLabel>
             <Select
@@ -285,7 +241,6 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
               })}
             </Select>
           </FormControl>
-          <Box my={2} />
 
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">
@@ -309,58 +264,96 @@ export const FormSignal = ({ onClose, open }: FormSignalProps) => {
               })}
             </Select>
           </FormControl>
-          <Box my={2} />
+
           <TextField
             fullWidth
             type="number"
             label="Precio de entrada"
             value={values.entryPrice}
             onChange={(e) => onChange("entryPrice", e.target.value)}
+            InputLabelProps={{ shrink: true }}
           />
-          <Box my={2} />
+
           <TextField
             fullWidth
             type="number"
             label="Stop loss"
             value={values.stopLoss}
             onChange={(e) => onChange("stopLoss", e.target.value)}
+            InputLabelProps={{ shrink: true }}
           />
-          <Box my={2} />
+
           <TextField
             fullWidth
             type="number"
             label="Take profit"
             value={values.takeProfit}
             onChange={(e) => onChange("takeProfit", e.target.value)}
+            InputLabelProps={{ shrink: true }}
           />
-          <Box my={2} />
-          <Box my={2} />
+
           <TextField
             fullWidth
             label="Riesgo relativo"
             value={values.relativeRisk}
             onChange={(e) => onChange("relativeRisk", e.target.value)}
+            InputLabelProps={{ shrink: true }}
           />
-          <Box my={2} />
+
+          <TextField
+            fullWidth
+            type="number"
+            label="Pips de Stop Loss"
+            value={values.stopLossPips}
+            onChange={(e) => onChange("stopLossPips", e.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
+
           <TextField
             fullWidth
             label="Acción"
+            placeholder="COMPRA / VENTA"
             value={values.action}
             onChange={(e) => onChange("action", e.target.value)}
+            InputLabelProps={{ shrink: true }}
           />
-          <Box my={2} />
+
           <TextField
             fullWidth
             label="Comentario"
             value={values.comment}
             onChange={(e) => onChange("comment", e.target.value)}
+            multiline
+            rows={3}
+            InputLabelProps={{ shrink: true }}
           />
-          <TextField
+
+          {imageBase64 && (
+            <Box mb={2} display="flex" justifyContent="center">
+              <Image
+                width={200}
+                height={200}
+                src={URL.createObjectURL(imageBase64)}
+                alt={"Preview"}
+                style={{ borderRadius: 8 }}
+              />
+            </Box>
+          )}
+          <Button
             fullWidth
-            label="Author"
-            value={values.author}
-            onChange={(e) => onChange("author", e.target.value)}
-          />
+            component="label"
+            variant="contained"
+            startIcon={<CloudUpload />}
+            sx={{ mb: 2 }}
+          >
+            Subir gráfica
+            <VisuallyHiddenInput
+              onChange={handleImagenChange}
+              accept="image/*"
+              type={"file"}
+            />
+          </Button>
+
         </Box>
       </DialogContent>
       <DialogActions>

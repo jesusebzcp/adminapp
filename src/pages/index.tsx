@@ -7,6 +7,7 @@ import { FormVideo } from "@app/presentantion/components/FormVideo";
 
 export default function Home() {
   const [openForm, setOpenForm] = useState(false);
+  const [currentFolder, setCurrentFolder] = useState<string | null>(null);
   return (
     <>
       <Head>
@@ -26,16 +27,22 @@ export default function Home() {
         >
           <Typography variant="h6">{"Creador de videos"}</Typography>
 
-          <Button
-            variant="outlined"
-            endIcon={<UploadFile />}
-            onClick={() => setOpenForm(true)}
-          >
-            Cargar video
-          </Button>
+          {currentFolder && (
+            <Button
+              variant="outlined"
+              endIcon={<UploadFile />}
+              onClick={() => setOpenForm(true)}
+            >
+              Cargar video aquí
+            </Button>
+          )}
         </Box>
-        <TableVideos />
-        <FormVideo onClose={() => setOpenForm(false)} open={openForm} />
+        <TableVideos onFolderChange={(folderId) => setCurrentFolder(folderId)} />
+        <FormVideo
+          onClose={() => setOpenForm(false)}
+          open={openForm}
+          initialTagId={currentFolder}
+        />
       </Box>
     </>
   );

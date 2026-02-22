@@ -14,7 +14,7 @@ const sendNotification = async (
         title: req.body.title,
         body: req.body.body,
       },
-      // ✅ Configuración para ANDROID (Sonido + Alta Prioridad)
+      // Configuración Explicita para que SUENE en Android
       android: {
         priority: 'high',
         notification: {
@@ -24,7 +24,7 @@ const sendNotification = async (
             priority: 'high'
         }
       },
-      // ✅ Configuración para iOS (Sonido)
+      // Configuración Explicita para que SUENE en iOS
       apns: {
         payload: {
             aps: {

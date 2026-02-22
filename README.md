@@ -1,40 +1,58 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# IA 369 Admin Panel
 
-## Getting Started
+The **IA 369 Admin Panel** is the official web-based administrative dashboard designed to manage the core operations, modules, and user base of the IA 369 mobile application ecosystem. Built for speed, high-end aesthetics, and robust content management.
 
-First, run the development server:
+## 🚀 Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Framework**: Prevailing [Next.js v14](https://nextjs.org/) (App/Pages router framework based on React 18) ensuring Server-Side Rendering (SSR) capabilities and optimized performance.
+- **UI Architecture**: Fully constructed using [Material-UI (MUI) v5](https://mui.com/) embracing a bespoke, dark-themed "Glassmorphism" design system tailored for institutional grade financial applications.
+- **State & Data Handling**: Powered by **Firebase (Firestore & Storage)** for real-time NoSQL data synchronization and media asset management.
+- **Styling**: `emotion` for advanced CSS-in-JS capabilities, deeply integrated with MUI's theming engine.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🏗 Features & Modules
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+### 1. 📊 Signals Management (Señales)
+- Create, Read, Update, and Delete (CRUD) trading signals.
+- Premium visualization cards with real-time status toggles (`Hit T.P 1`, `Hit Stop Loss`).
+- Built-in `FormSignal` modal for attaching analytical charts and setting entry metrics (Entry Price, Take Profit, Stop Loss).
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+### 2. 🎥 Video Academy (Videos)
+- Comprehensive video cataloging system mimicking premium streaming interfaces (e.g., Vimeo).
+- Categories management for structured learning courses.
+- Advanced `react-dropzone` integration for seamless drag-and-drop video uploads directly to Firebase Storage.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+### 3. 👥 Subscriptions & User Management (CRM)
+- Centralized Data Grid for managing the platform's client base.
+- Fast tracking of user roles (`user`, `premium`, `admin`).
+- Ability to manually extend subscriptions or modify access privileges instantly.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### 4. 🏷 Promotions Management
+- Dynamic management of promotional banners and affiliate links.
+- Image injection and redirect implementations.
 
-## Learn More
+## 🎨 Aesthetic Profile
 
-To learn more about Next.js, take a look at the following resources:
+The application utilizes a custom-built **Sleek Dark Theme** (`#050B14`, `#0D1117`, `#111827`). 
+It features:
+- **Glassmorphism Components**: Translucent panels (`backdropFilter: 'blur(12px)'`) blending backgrounds elegantly.
+- **Institutional Typography**: Deep grays (`#6B7280`) contrasted with stark white values to guide the eye across critical financial data.
+- **Intelligent Iconography**: Leveraging MUI's Outlined icon set for a minimalist, uncluttered feel.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ⚙️ Local Development
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+1. Clone the repository and install dependencies:
+   ```bash
+   npm install
+   ```
 
-## Deploy on Vercel
+2. Configure environment variables (Firebase config) if applicable via `.env.local`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+4. Open [http://localhost:3000](http://localhost:3000) (or 3001 depending on port availability) with your browser to see the result.
+
+## 🛡 Authentication & Security
+The platform uses Firebase Auth logic combined with Next.js API routes (if applicable) for securing notification triggers and admin-only panel routes.

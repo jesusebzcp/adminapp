@@ -35,43 +35,58 @@ export const LoginForm = () => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          mt: 8,
+          justifyContent: "center",
+          minHeight: "100vh",
         }}
       >
-        <Typography component="h1" variant="h5">
-          Bienvenido a CodigoFX
-        </Typography>
-        <form noValidate onSubmit={handleSubmit}>
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Correo electrónico"
-            name="email"
-            autoComplete="email"
-            autoFocus
-            value={formData.email}
-            onChange={handleChange}
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Contraseña"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value={formData.password}
-            onChange={handleChange}
-          />
-          <Button type="submit" fullWidth variant="contained" color="primary">
-            Iniciar sesión
-          </Button>
-        </form>
+        <Box
+          sx={{
+            backgroundColor: 'rgba(5, 11, 20, 0.6)',
+            padding: 4,
+            borderRadius: 4,
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            width: '100%',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Typography component="h1" variant="h5" sx={{ mb: 3, fontWeight: 'bold', color: '#fff' }}>
+            Bienvenido a IA 369
+          </Typography>
+          <form noValidate onSubmit={handleSubmit} style={{ width: '100%' }}>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Correo electrónico"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              value={formData.email}
+              onChange={handleChange}
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Contraseña"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+            <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3, py: 1.5 }}>
+              Iniciar sesión
+            </Button>
+          </form>
+        </Box>
       </Box>
     </Container>
   );
