@@ -6,7 +6,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Button, Chip, Box, IconButton, Tooltip, Menu, MenuItem, Typography, Avatar, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Button, Chip, Box, IconButton, Tooltip, Menu, MenuItem, Typography, Avatar, ToggleButton, ToggleButtonGroup, TextField } from "@mui/material";
 import dayjs from "dayjs";
 import { Download } from "@mui/icons-material";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
@@ -31,6 +31,7 @@ export function TableSubscription() {
 
   // Filter State
   const [filterRole, setFilterRole] = React.useState<string>('todos');
+  const [searchTerm, setSearchTerm] = React.useState<string>('');
 
   const handleFilterChange = (
     event: React.MouseEvent<HTMLElement>,
@@ -50,10 +51,26 @@ export function TableSubscription() {
     setActiveUser(null);
   };
 
+  const counts = React.useMemo(() => {
+    return {
+      admin: users.filter(u => u.rol === 'admin').length,
+      premium: users.filter(u => u.endDate && dayjs(u.endDate).toDate() > dayjs().toDate() && u.rol !== 'admin').length,
+      gratis: users.filter(u => !(u.endDate && dayjs(u.endDate).toDate() > dayjs().toDate()) && u.rol !== 'admin').length,
+      todos: users.length
+    };
+  }, [users]);
+
   const filteredUsers = React.useMemo(() => {
     return users.filter((user) => {
       const isPremium = user.endDate && dayjs(user.endDate).toDate() > dayjs().toDate();
       const isAdmin = user.rol === 'admin';
+
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch = !searchTerm ||
+        user.name?.toLowerCase().includes(searchLower) ||
+        user.email.toLowerCase().includes(searchLower);
+
+      if (!matchesSearch) return false;
 
       switch (filterRole) {
         case 'admin':
@@ -67,7 +84,7 @@ export function TableSubscription() {
           return true;
       }
     });
-  }, [users, filterRole]);
+  }, [users, filterRole, searchTerm]);
 
   const downloadPage = () => {
     const dataCopy = filteredUsers.map((u) => {
@@ -111,43 +128,70 @@ export function TableSubscription() {
           </div>
         )}
         <Box display="flex" justifyContent="space-between" alignItems="center" p={2} sx={{ borderBottom: '1px solid rgba(255,255,255,0.05)', flexWrap: 'wrap', gap: 2 }}>
-          <ToggleButtonGroup
-            value={filterRole}
-            exclusive
-            onChange={handleFilterChange}
-            aria-label="crm role filter"
-            size="small"
-            sx={{
-              backgroundColor: 'rgba(255,255,255,0.03)',
-              '& .MuiToggleButton-root': {
-                color: 'rgba(255,255,255,0.5)',
-                borderColor: 'rgba(255,255,255,0.1)',
-                px: 3,
-                textTransform: 'none',
-                fontWeight: 600,
-                '&.Mui-selected': {
-                  color: '#fff',
-                  backgroundColor: 'rgba(59, 130, 246, 0.2)', // Soft Blue Highlighting
-                },
-                '&:hover': {
-                  backgroundColor: 'rgba(255,255,255,0.08)'
+          <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
+            <ToggleButtonGroup
+              value={filterRole}
+              exclusive
+              onChange={handleFilterChange}
+              aria-label="crm role filter"
+              size="small"
+              sx={{
+                backgroundColor: 'rgba(255,255,255,0.03)',
+                '& .MuiToggleButton-root': {
+                  color: 'rgba(255,255,255,0.5)',
+                  borderColor: 'rgba(255,255,255,0.1)',
+                  px: 2,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  '&.Mui-selected': {
+                    color: '#fff',
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)', // Soft Blue Highlighting
+                  },
+                  '&:hover': {
+                    backgroundColor: 'rgba(255,255,255,0.08)'
+                  }
                 }
-              }
-            }}
-          >
-            <ToggleButton value="todos" aria-label="todos">
-              Todos
-            </ToggleButton>
-            <ToggleButton value="premium" aria-label="premium">
-              <WorkspacePremiumIcon sx={{ mr: 1, color: '#10b981', fontSize: 18 }} /> Premium
-            </ToggleButton>
-            <ToggleButton value="gratis" aria-label="gratis">
-              <PersonOutlineIcon sx={{ mr: 1, fontSize: 18 }} /> Gratis
-            </ToggleButton>
-            <ToggleButton value="admin" aria-label="admin">
-              <LocalFireDepartmentIcon sx={{ mr: 1, color: '#f59e0b', fontSize: 18 }} /> Admin
-            </ToggleButton>
-          </ToggleButtonGroup>
+              }}
+            >
+              <ToggleButton value="todos" aria-label="todos">
+                Todos ({counts.todos})
+              </ToggleButton>
+              <ToggleButton value="premium" aria-label="premium">
+                <WorkspacePremiumIcon sx={{ mr: 1, color: '#10b981', fontSize: 18 }} /> Premium ({counts.premium})
+              </ToggleButton>
+              <ToggleButton value="gratis" aria-label="gratis">
+                <PersonOutlineIcon sx={{ mr: 1, fontSize: 18 }} /> Gratis ({counts.gratis})
+              </ToggleButton>
+              <ToggleButton value="admin" aria-label="admin">
+                <LocalFireDepartmentIcon sx={{ mr: 1, color: '#f59e0b', fontSize: 18 }} /> Admin ({counts.admin})
+              </ToggleButton>
+            </ToggleButtonGroup>
+
+            {/* NEW: SEARCH BAR */}
+            <TextField
+              placeholder="Buscar por nombre o correo..."
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              onChange={(e: any) => setSearchTerm(e.target.value)}
+              sx={{
+                minWidth: 250,
+                '& .MuiOutlinedInput-root': {
+                  color: '#fff',
+                  backgroundColor: 'rgba(255,255,255,0.03)',
+                  '& fieldset': {
+                    borderColor: 'rgba(255,255,255,0.1)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'rgba(255,255,255,0.3)',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#3b82f6',
+                  },
+                }
+              }}
+            />
+          </Box>
 
           <Box display="flex" gap={1}>
             <Button variant="contained" color="success" onClick={() => setEditData({} as any)}> + Agregar Cliente </Button>
