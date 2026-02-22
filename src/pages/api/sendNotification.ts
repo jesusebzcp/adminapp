@@ -1,5 +1,4 @@
 import admin from "@app/application/config/firebaseAdmin";
-import { messaging } from "firebase-admin";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const sendNotification = async (req: NextApiRequest, res: NextApiResponse<any>) => {
@@ -19,7 +18,7 @@ const sendNotification = async (req: NextApiRequest, res: NextApiResponse<any>) 
 
     console.log(`Sending broad topic-based notification to: ${topic}`);
 
-    await messaging().send({
+    await admin.messaging().send({
       topic: topic,
       notification: {
         title,
