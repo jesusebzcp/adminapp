@@ -110,49 +110,7 @@ export const useUsersDirectory = () => {
             console.log("Error fetching directory:", error);
             toast.error("Error al cargar el directorio de clientes.");
         } finally {
-            // 4. Fallback Mock Data for UI Designing if empty
-            if (combinedList.length === 0) {
-                combinedList = [
-                    {
-                        id: "mock-user-1",
-                        userId: "uid-1",
-                        email: "andres@ia369.com",
-                        name: "Andres VIP",
-                        phone: "+123456789",
-                        rol: "admin",
-                        signalNotification: true,
-                        messageNotification: true,
-                        videoNotification: true,
-                        subscriptionId: "mock-sub-1",
-                        endDate: dayjs().add(30, 'day').toDate()
-                    },
-                    {
-                        id: "mock-user-2",
-                        userId: "uid-2",
-                        email: "usuario.gratis@gmail.com",
-                        name: "Juan Perez",
-                        phone: "+987654321",
-                        rol: "user",
-                        signalNotification: false,
-                        messageNotification: true,
-                        videoNotification: false,
-                        // NO SUBSCRIPTION
-                    },
-                    {
-                        id: "mock-user-3",
-                        userId: "uid-3",
-                        email: "trader.vencido@hotmail.com",
-                        name: "Maria Lopez",
-                        phone: "",
-                        rol: "user",
-                        signalNotification: true,
-                        messageNotification: true,
-                        videoNotification: true,
-                        subscriptionId: "mock-sub-3",
-                        endDate: dayjs().subtract(5, 'day').toDate()
-                    }
-                ];
-            }
+
 
             setUsers(combinedList);
             setLoading(false);

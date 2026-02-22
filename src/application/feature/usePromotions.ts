@@ -11,45 +11,17 @@ export function usePromotions() {
 
     const getPromotions = async () => {
         setLoading(true);
-        // try {
-        //   const q = query(collection(db, "Promotions"), orderBy("createdAt", "desc"));
-        //   const querySnapshot = await getDocs(q);
-        //   const promosArr: any[] = [];
-        //   querySnapshot.forEach((doc: any) => {
-        //     promosArr.push({ id: doc.id, ...doc.data() });
-        //   });
-        //   setPromotions(promosArr);
-        // } catch (error) {
-        //    toast("Ocurrió un error al traer las promociones");
-        // }
-
-        // MOCK DATA FOR UI REVIEW
-        setPromotions([
-            {
-                id: "mock-1",
-                imageUrl: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                active: true,
-                frequencyType: "always",
-                redirectUrl: "https://wa.me/1234567890",
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: "mock-2",
-                imageUrl: "https://images.unsplash.com/photo-1621252179027-94459d278660?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                active: false,
-                frequencyType: "once",
-                redirectUrl: "",
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: "mock-3",
-                imageUrl: "https://images.unsplash.com/photo-1600132806370-bf17e65e942f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-                active: true,
-                frequencyType: "weekly",
-                redirectUrl: "https://instagram.com/codigo_369",
-                createdAt: new Date().toISOString()
-            }
-        ]);
+        try {
+            const q = query(collection(db, "Promotions"), orderBy("createdAt", "desc"));
+            const querySnapshot = await getDocs(q);
+            const promosArr: any[] = [];
+            querySnapshot.forEach((doc: any) => {
+                promosArr.push({ id: doc.id, ...doc.data() });
+            });
+            setPromotions(promosArr);
+        } catch (error) {
+            toast.error("Ocurrió un error al traer las promociones");
+        }
         setLoading(false);
     };
 

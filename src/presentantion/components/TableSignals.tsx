@@ -157,12 +157,12 @@ export function TableSignals() {
 
                 {/* Middle Section: Image */}
                 <Box sx={{ width: '100%', height: 160, backgroundColor: '#1F2937', position: 'relative' }}>
-                  {signal.image ? (
+                  {signal.graphImage || signal.image ? (
                     <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
                       <CardMedia
                         component="img"
                         height="160"
-                        image={signal.image}
+                        image={signal.graphImage || signal.image}
                         alt="Analysis Graph"
                         sx={{ objectFit: 'cover' }}
                       />
