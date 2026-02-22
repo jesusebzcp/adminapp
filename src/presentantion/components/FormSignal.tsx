@@ -53,6 +53,7 @@ export const typeStatus = ["Activa", "Pendiente", "Descartada"];
 
 export const initialState = {
   assetInput: "",
+  customAsset: "",
   comment: "",
   action: "",
   entryPrice: "",
@@ -110,10 +111,11 @@ export const FormSignal = ({ onClose, open, initialData }: FormSignalProps) => {
     try {
       setLoading(true);
 
-      const hasSlash = values.assetInput.includes('/');
+      const actualAsset = values.assetInput === 'Otro' ? ((values as any).customAsset || 'Otro') : values.assetInput;
+      const hasSlash = actualAsset.includes('/');
       const [base, quote] = hasSlash
-        ? values.assetInput.split('/')
-        : [values.assetInput, ""];
+        ? actualAsset.split('/')
+        : [actualAsset, ""];
 
       const docData: any = {
         defaultCurrency: base.trim(),
@@ -229,6 +231,16 @@ export const FormSignal = ({ onClose, open, initialData }: FormSignalProps) => {
               <TextField {...params} label="Activo" InputLabelProps={{ shrink: true }} placeholder="Selecciona o escribe uno nuevo" />
             )}
           />
+          {values.assetInput === 'Otro' && (
+            <TextField
+              fullWidth
+              label="Escribe el Activo Manualmente"
+              placeholder="Ej: BTC/USD, TSLA"
+              value={(values as any).customAsset || ""}
+              onChange={(e) => onChange("customAsset" as any, e.target.value)}
+              InputLabelProps={{ shrink: true }}
+            />
+          )}
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Tipo de orden</InputLabel>
             <Select
