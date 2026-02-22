@@ -43,9 +43,9 @@ const sendNotification = async (req: NextApiRequest, res: NextApiResponse<any>) 
 
     res.status(200).json({ message: "Se envió la notificación por Tópico (Topic) a la app móvil." });
 
-  } catch (error) {
+  } catch (error: any) {
     console.log("error", error);
-    res.status(500).json({ error: "Failed to send notification via Topic" });
+    res.status(500).json({ error: "Failed to send notification via Topic", details: error.message });
   }
 };
 export default sendNotification;
