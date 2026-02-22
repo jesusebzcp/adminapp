@@ -36,7 +36,7 @@ const sendNotification = async (req: NextApiRequest, res: NextApiResponse<any>) 
           'apns-priority': '10',
         },
         payload: {
-          aps: { sound: 'default', contentAvailable: true, mutableContent: true }
+          aps: { sound: 'default' }
         }
       }
     });
