@@ -20,6 +20,7 @@ import NewspaperIcon from '@mui/icons-material/Newspaper';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import dayjs from "dayjs";
 import { FormNews } from "./FormNews";
+import { ComposeNews } from "./ComposeNews";
 
 export function TableNews() {
     const { news, getNews, loading, onDelete } = useNews();
@@ -44,6 +45,10 @@ export function TableNews() {
 
             {/* Centralized Discord-style Feed Container */}
             <Box sx={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 1 }}>
+
+                {/* Inline Creation Input */}
+                <ComposeNews onSuccess={getNews} />
+
                 {loading ? (
                     /* Skeleton Loading States */
                     Array.from(new Array(3)).map((_, index) => (
