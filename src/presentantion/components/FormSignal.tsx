@@ -192,7 +192,7 @@ export const FormSignal = ({ onClose, open, initialData }: FormSignalProps) => {
     );
   }
   return (
-    <Dialog onClose={onClose} open={open}>
+    <Dialog onClose={onClose} open={open} fullWidth maxWidth="sm">
       <DialogTitle>{initialData?.id ? 'Editar Señal' : 'Creador de señales'}</DialogTitle>
       <DialogContent>
         {imageBase64 ? (
@@ -211,10 +211,7 @@ export const FormSignal = ({ onClose, open, initialData }: FormSignalProps) => {
           />
         ) : null}
         <Box
-          {...(matches && {
-            width: 500,
-          })}
-          sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 2, mb: 2 }}
+          sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 2, mb: 2, width: '100%' }}
         >
           <Autocomplete
             fullWidth

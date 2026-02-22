@@ -22,7 +22,10 @@ export default function Home() {
           style={{
             flexDirection: "row",
             display: "flex",
+            flexWrap: "wrap",
+            gap: "16px",
             justifyContent: "space-between",
+            alignItems: "center"
           }}
         >
           <Typography variant="h6">{"Creador de videos"}</Typography>

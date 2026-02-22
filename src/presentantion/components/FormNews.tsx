@@ -155,7 +155,7 @@ export const FormNews = ({ onClose, open, initialData }: FormNewsProps) => {
     }
 
     return (
-        <Dialog onClose={onClose} open={open} PaperProps={{ sx: { minWidth: matches ? 500 : '90%' } }}>
+        <Dialog onClose={onClose} open={open} fullWidth maxWidth="sm">
             <DialogTitle>{initialData?.id ? 'Editar Noticia' : 'Publicar Nueva Noticia'}</DialogTitle>
             <DialogContent>
                 {imageBase64 ? (

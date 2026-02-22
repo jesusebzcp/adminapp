@@ -107,8 +107,8 @@ export function TableSubscription() {
   };
 
   return (
-    <Box sx={{ mt: 3, mb: 10 }}>
-      <TableContainer component={Paper} sx={{ borderRadius: 4, backgroundColor: '#050B14' }}>
+    <Box sx={{ mt: 3, mb: 10, width: '100%', overflow: 'hidden' }}>
+      <TableContainer component={Paper} sx={{ borderRadius: 4, backgroundColor: '#050B14', width: '100%', overflowX: 'auto' }}>
         {loading && (
           <div
             style={{
@@ -138,6 +138,8 @@ export function TableSubscription() {
               size="small"
               sx={{
                 backgroundColor: 'rgba(255,255,255,0.03)',
+                display: 'flex',
+                flexWrap: 'wrap',
                 '& .MuiToggleButton-root': {
                   color: 'rgba(255,255,255,0.5)',
                   borderColor: 'rgba(255,255,255,0.1)',
