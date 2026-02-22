@@ -180,6 +180,7 @@ export const FormVideo = ({ onClose, open, initialTagId, initialData }: FormVide
         docData.create = Timestamp.fromDate(new Date());
         docData.comments = [];
         docData.attachment = [];
+        docData.orderIndex = 999999;
 
         const videosRef = collection(db, "videos");
         await setDoc(doc(videosRef), docData);
