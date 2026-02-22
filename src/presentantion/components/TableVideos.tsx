@@ -1,5 +1,19 @@
 import * as React from "react";
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  rectSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import SaveIcon from '@mui/icons-material/Save';
 import {
@@ -31,6 +45,100 @@ import FolderIcon from '@mui/icons-material/Folder';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { FormVideo } from "./FormVideo";
 
+
+function SortableVideoCard({ video, isReordering, onEdit, onDelete }: any) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: video.id, disabled: !isReordering });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 9999 : 1,
+    position: 'relative' as any,
+  };
+
+  return (
+    <Grid item xs={12} sm={6} md={4} ref={setNodeRef} style={style}>
+      <Card
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: 'rgba(5, 11, 20, 0.8)',
+          borderRadius: 4,
+          border: isDragging ? '2px solid #0052cc' : '1px solid rgba(255, 255, 255, 0.05)',
+          transition: isDragging ? 'none' : 'transform 0.2s, box-shadow 0.2s',
+          boxShadow: isDragging ? '0 16px 32px rgba(0,0,0,0.8)' : 'none',
+          opacity: isReordering && !isDragging ? 0.7 : 1,
+        }}
+      >
+        {isReordering && (
+          <Box
+            {...attributes}
+            {...listeners}
+            sx={{
+              position: 'absolute',
+              top: 8, right: 8,
+              backgroundColor: 'rgba(0,0,0,0.7)',
+              borderRadius: '50%',
+              padding: 1,
+              zIndex: 20,
+              cursor: 'grab',
+              display: 'flex',
+              backdropFilter: 'blur(4px)',
+              color: '#FFF'
+            }}
+          >
+            <DragIndicatorIcon />
+          </Box>
+        )}
+        <CardMedia
+          component="img"
+          height="200"
+          image={video.coverUrl || "https://images.unsplash.com/photo-1611162617474-5b21e879e113"}
+          alt={video.title}
+          sx={{ objectFit: 'cover', opacity: isReordering ? 0.5 : 1 }}
+        />
+        <CardContent sx={{ flexGrow: 1, pb: 1 }}>
+          <Typography gutterBottom variant="h6" component="h2" sx={{ fontWeight: 'bold', fontSize: '1.1rem', lineHeight: 1.2 }}>
+            {video.title}
+          </Typography>
+          {!isReordering && (
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', mb: 2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+              {video.description}
+            </Typography>
+          )}
+          <Box display="flex" alignItems="center" gap={1}>
+            <Tooltip title={`${video.comments?.length || 0} Comentarios`}>
+              <Badge badgeContent={video.comments?.length || 0} color="primary" sx={{ '& .MuiBadge-badge': { backgroundColor: '#0052cc' } }}>
+                <ChatBubbleOutlineIcon fontSize="small" sx={{ color: 'rgba(255,255,255,0.5)' }} />
+              </Badge>
+            </Tooltip>
+          </Box>
+        </CardContent>
+        {!isReordering && (
+          <CardActions sx={{ borderTop: '1px solid rgba(255,255,255,0.05)', justifyContent: 'space-between', px: 2, pb: 2, pt: 1.5 }}>
+            <Button size="small" startIcon={<EditOutlinedIcon />} onClick={onEdit} sx={{ color: 'rgba(255,255,255,0.7)' }}>
+              Editar
+            </Button>
+            <Tooltip title="Eliminar Video">
+              <IconButton size="small" color="error" onClick={onDelete}>
+                <DeleteOutlineIcon />
+              </IconButton>
+            </Tooltip>
+          </CardActions>
+        )}
+      </Card>
+    </Grid>
+  );
+}
+
 export function TableVideos({ onFolderChange }: { onFolderChange: (categoryId: string | null) => void }) {
   const { videos, loading, getVideos, handleDeleteVideo, updateVideoOrder } = useVideos();
   const { tags } = useTags();
@@ -42,6 +150,14 @@ export function TableVideos({ onFolderChange }: { onFolderChange: (categoryId: s
   // Drag and drop state
   const [isReordering, setIsReordering] = React.useState(false);
   const [localVideos, setLocalVideos] = React.useState<VideoDocument[]>([]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      },
+    })
+  );
 
   React.useEffect(() => {
     onFolderChange(selectedFolderId);
@@ -158,14 +274,16 @@ export function TableVideos({ onFolderChange }: { onFolderChange: (categoryId: s
       </Box>
     );
   }
-  const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
 
-    const items = Array.from(localVideos);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    setLocalVideos(items);
+    if (over && active.id !== over.id) {
+      setLocalVideos((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
   };
 
   const saveNewOrder = () => {
@@ -239,101 +357,28 @@ export function TableVideos({ onFolderChange }: { onFolderChange: (categoryId: s
           <Typography variant="h6" color="textSecondary">Esta carpeta está vacía</Typography>
         </Box>
       ) : (
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable droppableId="video-list" direction="horizontal" isDropDisabled={!isReordering}>
-            {(provided) => (
-              <Grid container spacing={3} {...provided.droppableProps} ref={provided.innerRef}>
-                {localVideos.map((video: VideoDocument, index: number) => (
-                  <Draggable key={video.id} draggableId={video.id} index={index} isDragDisabled={!isReordering}>
-                    {(provided, snapshot) => (
-                      <Grid
-                        item xs={12} sm={6} md={4}
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        style={{
-                          ...provided.draggableProps.style,
-                          ...(snapshot.isDragging && { zIndex: 9999 })
-                        }}
-                      >
-                        <Card
-                          sx={{
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            backgroundColor: 'rgba(5, 11, 20, 0.8)',
-                            borderRadius: 4,
-                            border: snapshot.isDragging ? '2px solid #0052cc' : '1px solid rgba(255, 255, 255, 0.05)',
-                            transition: snapshot.isDragging ? 'none' : 'transform 0.2s, box-shadow 0.2s',
-                            position: 'relative',
-                            boxShadow: snapshot.isDragging ? '0 16px 32px rgba(0,0,0,0.8)' : 'none',
-                            opacity: isReordering && !snapshot.isDragging ? 0.7 : 1,
-                          }}
-                        >
-                          {isReordering && (
-                            <Box
-                              {...provided.dragHandleProps}
-                              sx={{
-                                position: 'absolute',
-                                top: 8, right: 8,
-                                backgroundColor: 'rgba(0,0,0,0.7)',
-                                borderRadius: '50%',
-                                padding: 1,
-                                zIndex: 20,
-                                cursor: 'grab',
-                                display: 'flex',
-                                backdropFilter: 'blur(4px)',
-                                color: '#FFF'
-                              }}
-                            >
-                              <DragIndicatorIcon />
-                            </Box>
-                          )}
-                          <CardMedia
-                            component="img"
-                            height="200"
-                            image={video.coverUrl || "https://images.unsplash.com/photo-1611162617474-5b21e879e113"}
-                            alt={video.title}
-                            sx={{ objectFit: 'cover', opacity: isReordering ? 0.5 : 1 }}
-                          />
-                          <CardContent sx={{ flexGrow: 1, pb: 1 }}>
-                            <Typography gutterBottom variant="h6" component="h2" sx={{ fontWeight: 'bold', fontSize: '1.1rem', lineHeight: 1.2 }}>
-                              {video.title}
-                            </Typography>
-                            {!isReordering && (
-                              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.6)', mb: 2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                {video.description}
-                              </Typography>
-                            )}
-                            <Box display="flex" alignItems="center" gap={1}>
-                              <Tooltip title={`${video.comments?.length || 0} Comentarios`}>
-                                <Badge badgeContent={video.comments?.length || 0} color="primary" sx={{ '& .MuiBadge-badge': { backgroundColor: '#0052cc' } }}>
-                                  <ChatBubbleOutlineIcon fontSize="small" sx={{ color: 'rgba(255,255,255,0.5)' }} />
-                                </Badge>
-                              </Tooltip>
-                            </Box>
-                          </CardContent>
-                          {!isReordering && (
-                            <CardActions sx={{ borderTop: '1px solid rgba(255,255,255,0.05)', justifyContent: 'space-between', px: 2, pb: 2, pt: 1.5 }}>
-                              <Button size="small" startIcon={<EditOutlinedIcon />} onClick={() => setEditVideoData(video)} sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                Editar
-                              </Button>
-                              <Tooltip title="Eliminar Video">
-                                <IconButton size="small" color="error" onClick={() => setDeleteId(video.id)}>
-                                  <DeleteOutlineIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </CardActions>
-                          )}
-                        </Card>
-                      </Grid>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </Grid>
-            )}
-          </Droppable>
-        </DragDropContext>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={localVideos.map(v => v.id)}
+            strategy={rectSortingStrategy}
+          >
+            <Grid container spacing={3}>
+              {localVideos.map((video: VideoDocument) => (
+                <SortableVideoCard
+                  key={video.id}
+                  video={video}
+                  isReordering={isReordering}
+                  onEdit={() => setEditVideoData(video)}
+                  onDelete={() => setDeleteId(video.id)}
+                />
+              ))}
+            </Grid>
+          </SortableContext>
+        </DndContext>
       )}
 
       {/* Delete Confirmation Dialog */}
