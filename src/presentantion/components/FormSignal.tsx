@@ -224,7 +224,7 @@ export const FormSignal = ({ onClose, open, initialData }: FormSignalProps) => {
             value={values.assetInput || null}
             onChange={(_, newValue) => onChange("assetInput", newValue || "")}
             renderInput={(params) => (
-              <TextField {...params} label="Activo (Mismos de la Calculadora CFD)" InputLabelProps={{ shrink: true }} />
+              <TextField {...params} label="Activo" InputLabelProps={{ shrink: true }} />
             )}
           />
           <FormControl fullWidth>
