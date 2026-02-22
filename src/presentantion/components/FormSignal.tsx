@@ -216,15 +216,17 @@ export const FormSignal = ({ onClose, open, initialData }: FormSignalProps) => {
         >
           <Autocomplete
             fullWidth
+            freeSolo
             options={[
               "NAS100", "SPX500", "XAU/USD", "EUR/USD", "GBP/USD", "AUD/USD", "NZD/USD",
               "USD/JPY", "USD/CAD", "USD/CHF", "GBP/CHF", "EUR/GBP", "GBP/JPY", "EUR/CAD",
-              "EUR/JPY", "AUD/CHF", "EUR/NZD", "CAD/CHF", "GBP/CAD", "GBP/AUD"
+              "EUR/JPY", "AUD/CHF", "EUR/NZD", "CAD/CHF", "GBP/CAD", "GBP/AUD", "Otro"
             ]}
             value={values.assetInput || null}
             onChange={(_, newValue) => onChange("assetInput", newValue || "")}
+            onInputChange={(_, newValue) => onChange("assetInput", newValue || "")}
             renderInput={(params) => (
-              <TextField {...params} label="Activo" InputLabelProps={{ shrink: true }} />
+              <TextField {...params} label="Activo" InputLabelProps={{ shrink: true }} placeholder="Selecciona o escribe uno nuevo" />
             )}
           />
           <FormControl fullWidth>
