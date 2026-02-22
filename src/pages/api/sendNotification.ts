@@ -18,18 +18,20 @@ const sendNotification = async (
       android: {
         priority: 'high',
         notification: {
-            sound: 'default',
-            channelId: 'default',
-            defaultSound: true,
-            priority: 'high'
+          sound: 'default',
+          channelId: 'default',
+          defaultSound: true,
+          priority: 'high'
         }
       },
       // Configuración Explicita para que SUENE en iOS
       apns: {
         payload: {
-            aps: {
-                sound: 'default',
-            }
+          aps: {
+            sound: 'default',
+            contentAvailable: true,
+            mutableContent: true,
+          }
         }
       }
     });
