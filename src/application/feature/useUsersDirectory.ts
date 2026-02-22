@@ -27,7 +27,14 @@ export const useUsersDirectory = () => {
     async function getUsersDirectory() {
         setLoading(true);
         try {
-            const response = await fetch('/api/getUsers');
+            const timestamp = new Date().getTime();
+            const response = await fetch(`/api/getUsers?t=${timestamp}`, {
+                cache: 'no-store',
+                headers: {
+                    'Pragma': 'no-cache',
+                    'Cache-Control': 'no-cache'
+                }
+            });
             if (!response.ok) {
                 throw new Error("Failed to fetch CRM users");
             }

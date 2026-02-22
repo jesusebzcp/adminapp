@@ -5,6 +5,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (req.method !== 'GET') {
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
 
     try {
         const db = admin.firestore();
@@ -44,13 +47,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             const emailLower = authUser.email.toLowerCase();
 
-            let fData = firestoreUsers[authUser.uid] || {};
-            const byEmail = Object.values(firestoreUsers).find(u => u.email?.toLowerCase() === emailLower);
+            const byUserId = Object.values(firestoreUsers).find(u => u.userId === authUser.uid) || {};
+            const byEmail = Object.values(firestoreUsers).find(u => u.email?.toLowerCase() === emailLower) || {};
+            const byDocId = firestoreUsers[authUser.uid] || {};
 
             // Merge both documents if they exist. Priority: Auth -> UID doc -> Email doc
-            // The UID doc usually only has the fcm token and notifications.
-            // The Email doc usually has manually assigned roles or phone numbers.
-            const mergedFData = { ...byEmail, ...fData };
+            const mergedFData = { ...byUserId, ...byEmail, ...byDocId };
+
+            // Ensure roles combine properly (escalate rather than accidentally downgrade)
+            if (byUserId.rol === 'admin' || byEmail.rol === 'admin' || byDocId.rol === 'admin') {
+                mergedFData.rol = 'admin';
+            } else if (byUserId.rol === 'premium' || byEmail.rol === 'premium' || byDocId.rol === 'premium') {
+                mergedFData.rol = 'premium';
+            }
+
+            const phone = authUser.phoneNumber || byUserId.phone || byEmail.phone || byDocId.phone || "";
 
             const subData = subscriptions[emailLower];
 
@@ -64,11 +75,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
 
             combinedList.push({
-                id: mergedFData.id || authUser.uid,
+                id: byUserId.id || byDocId.id || authUser.uid,
                 userId: authUser.uid,
                 email: authUser.email,
                 name: authUser.displayName || mergedFData.name || "Sin Nombre",
-                phone: authUser.phoneNumber || mergedFData.phone || "",
+                phone: phone,
                 rol: mergedFData.rol || "user",
                 signalNotification: mergedFData.signalNotification === undefined ? true : Boolean(mergedFData.signalNotification),
                 messageNotification: mergedFData.messageNotification === undefined ? true : Boolean(mergedFData.messageNotification),
