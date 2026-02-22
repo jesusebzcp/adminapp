@@ -32,6 +32,9 @@ const sendNotification = async (req: NextApiRequest, res: NextApiResponse<any>) 
       },
       // Configuración Explicita para que SUENE en iOS
       apns: {
+        headers: {
+          'apns-priority': '10',
+        },
         payload: {
           aps: { sound: 'default', contentAvailable: true, mutableContent: true }
         }
