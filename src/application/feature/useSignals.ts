@@ -1,5 +1,5 @@
 import { initialState } from "@app/presentantion/components/FormSignal";
-import { collection, deleteDoc, doc, getDocs } from "firebase/firestore/lite";
+import { collection, deleteDoc, doc, getDocs, query, orderBy } from "firebase/firestore/lite";
 import { useEffect, useState } from "react";
 import { db } from "../config/firebase";
 
@@ -12,7 +12,8 @@ export const useSignals = () => {
     let fetchedSignals: any[] = [];
     try {
       const videosCol = collection(db, "Signals");
-      const videosSnapshot = await getDocs(videosCol);
+      const q = query(videosCol, orderBy("date", "desc"));
+      const videosSnapshot = await getDocs(q);
       const videosList: any = videosSnapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,

@@ -214,12 +214,20 @@ export const FormSignal = ({ onClose, open, initialData }: FormSignalProps) => {
           })}
           sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 2, mb: 2 }}
         >
-          <TextField
+          <Autocomplete
             fullWidth
-            label="Activo (Ej: EUR/USD o Nasdaq)"
-            value={values.assetInput}
-            onChange={(e) => onChange("assetInput", e.target.value)}
-            InputLabelProps={{ shrink: true }}
+            options={[
+              "NAS100", "SPX500", "XAU/USD", "EUR/USD", "GBP/USD", "AUD/USD", "NZD/USD",
+              "USD/JPY", "USD/CAD", "USD/CHF", "GBP/CHF", "EUR/GBP", "GBP/JPY", "EUR/CAD",
+              "EUR/JPY", "AUD/CHF", "EUR/NZD", "CAD/CHF", "GBP/CAD", "GBP/AUD",
+              "Micro S&P 500 (MES)", "Micro Nasdaq (MNQ)", "Micro Gold (MGC)",
+              "S&P 500 (ES)", "Nasdaq (NQ)", "Gold (GC)"
+            ]}
+            value={values.assetInput || null}
+            onChange={(_, newValue) => onChange("assetInput", newValue || "")}
+            renderInput={(params) => (
+              <TextField {...params} label="Activo (Mismos de la Calculadora CFD)" InputLabelProps={{ shrink: true }} />
+            )}
           />
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Tipo de orden</InputLabel>
