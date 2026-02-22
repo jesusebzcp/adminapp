@@ -48,16 +48,28 @@ export const useUsersDirectory = () => {
         }
     }
 
-    const deleteSubscriptionRecord = async (subscriptionId: string) => {
+    const deleteUserRecord = async (user: UserDirectoryData) => {
         try {
-            if (!subscriptionId.startsWith('mock-')) {
-                await deleteDoc(doc(db, "subscription", subscriptionId));
+            const response = await fetch('/api/deleteUser', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    uid: user.userId,
+                    email: user.email,
+                    docId: user.id,
+                    subscriptionId: user.subscriptionId
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to delete user via API");
             }
+
             getUsersDirectory();
-            toast.success("Suscripción eliminada.");
+            toast.success("Usuario eliminado por completo del sistema.");
         } catch (error) {
             console.log(error);
-            toast.error("Ocurrió un error al eliminar la suscripción");
+            toast.error("Ocurrió un error al intentar eliminar el usuario.");
         }
     };
 
@@ -84,7 +96,7 @@ export const useUsersDirectory = () => {
         users,
         getUsersDirectory,
         loading,
-        deleteSubscriptionRecord,
+        deleteUserRecord,
         promoteToAdmin
     };
 };

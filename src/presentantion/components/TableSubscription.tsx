@@ -6,7 +6,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Button, Chip, Box, IconButton, Tooltip, Menu, MenuItem, Typography, Avatar, ToggleButton, ToggleButtonGroup, TextField } from "@mui/material";
+import { Button, Chip, Box, IconButton, Tooltip, Menu, MenuItem, Typography, Avatar, ToggleButton, ToggleButtonGroup, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from "@mui/material";
 import dayjs from "dayjs";
 import { Download } from "@mui/icons-material";
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
@@ -21,8 +21,9 @@ import { useUsersDirectory, UserDirectoryData } from "@app/application/feature/u
 import { FormSubscription } from "./FormSubscription";
 
 export function TableSubscription() {
-  const { users, getUsersDirectory, loading, deleteSubscriptionRecord, promoteToAdmin } = useUsersDirectory();
+  const { users, getUsersDirectory, loading, deleteUserRecord, promoteToAdmin } = useUsersDirectory();
   const [editData, setEditData] = React.useState<UserDirectoryData | null>(null);
+  const [deleteConfirmUser, setDeleteConfirmUser] = React.useState<UserDirectoryData | null>(null);
 
   // Menu State
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -332,8 +333,8 @@ export function TableSubscription() {
               <AdminPanelSettingsIcon fontSize="small" sx={{ mr: 1.5, color: '#f59e0b' }} /> Promover a Administrador
             </MenuItem>
           )}
-          <MenuItem onClick={() => { activeUser?.subscriptionId && deleteSubscriptionRecord(activeUser.subscriptionId); handleMenuClose(); }}>
-            <DeleteOutlineIcon fontSize="small" sx={{ mr: 1.5, color: '#ef4444' }} /> Eliminar Suscripción
+          <MenuItem onClick={() => { setDeleteConfirmUser(activeUser); handleMenuClose(); }} sx={{ color: '#ef4444' }}>
+            <DeleteOutlineIcon fontSize="small" sx={{ mr: 1.5, color: '#ef4444' }} /> Eliminar Usuario
           </MenuItem>
         </Menu>
 
@@ -348,6 +349,55 @@ export function TableSubscription() {
           onRefresh={getUsersDirectory}
         />
       )}
+
+      {/* Strict Deletion Confirmation Dialog */}
+      <Dialog
+        open={Boolean(deleteConfirmUser)}
+        onClose={() => setDeleteConfirmUser(null)}
+        PaperProps={{
+          style: {
+            backgroundColor: '#1E293B',
+            color: '#fff',
+            minWidth: 400
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#ef4444', fontWeight: 'bold' }}>
+          Restricción: Eliminación Permanente
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ color: 'rgba(255,255,255,0.7)', mb: 2 }}>
+            ¿Estás absolutamente seguro de que deseas eliminar a este usuario de la plataforma de forma irreversible?
+          </DialogContentText>
+          {deleteConfirmUser && (
+            <Box sx={{ p: 2, backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: 2 }}>
+              <Typography variant="body2" sx={{ color: '#fff', fontWeight: 'bold' }}>Nombre: {deleteConfirmUser.name || 'Sin Nombre'}</Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>Email: {deleteConfirmUser.email}</Typography>
+              <Typography variant="caption" sx={{ color: '#ef4444', display: 'block', mt: 1 }}>
+                * Esto eliminará permanentemente su acceso en Firebase Auth, sus datos en Users, y su suscripción actual.
+              </Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setDeleteConfirmUser(null)} sx={{ color: 'rgba(255,255,255,0.7)' }}>
+            Cancelar
+          </Button>
+          <Button
+            onClick={() => {
+              if (deleteConfirmUser) {
+                deleteUserRecord(deleteConfirmUser);
+                setDeleteConfirmUser(null);
+              }
+            }}
+            color="error"
+            variant="contained"
+            disableElevation
+          >
+            Eliminar Definitivamente
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
