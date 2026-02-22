@@ -10,6 +10,7 @@ import SmartDisplayOutlinedIcon from '@mui/icons-material/SmartDisplayOutlined';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import WorkspacePremiumOutlinedIcon from '@mui/icons-material/WorkspacePremiumOutlined';
 import DiscountOutlinedIcon from '@mui/icons-material/DiscountOutlined';
+import NewspaperOutlinedIcon from '@mui/icons-material/NewspaperOutlined';
 import { useRouter } from "next/router";
 
 export const MainLayout = ({ children }: any) => {
@@ -24,6 +25,8 @@ export const MainLayout = ({ children }: any) => {
       setValue(2);
     } else if (router.pathname.includes("/promotions")) {
       setValue(3);
+    } else if (router.pathname.includes("/news")) {
+      setValue(4);
     } else {
       setValue(0);
     }
@@ -81,7 +84,7 @@ export const MainLayout = ({ children }: any) => {
           }}
           onChange={(_, newValue) => {
             setValue(newValue);
-            const routes = ["/", "/signals", "/subscription", "/promotions"];
+            const routes = ["/", "/signals", "/subscription", "/promotions", "/news"];
             router.push(routes[newValue]);
           }}
         >
@@ -100,6 +103,10 @@ export const MainLayout = ({ children }: any) => {
           <BottomNavigationAction
             label="Promociones"
             icon={<DiscountOutlinedIcon />}
+          />
+          <BottomNavigationAction
+            label="Noticias"
+            icon={<NewspaperOutlinedIcon />}
           />
         </BottomNavigation>
       </Paper>
