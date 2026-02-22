@@ -45,10 +45,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             const emailLower = authUser.email.toLowerCase();
 
             let fData = firestoreUsers[authUser.uid] || {};
-            if (!fData.id) {
-                const byEmail = Object.values(firestoreUsers).find(u => u.email?.toLowerCase() === emailLower);
-                if (byEmail) fData = byEmail;
-            }
+            const byEmail = Object.values(firestoreUsers).find(u => u.email?.toLowerCase() === emailLower);
+
+            // Merge both documents if they exist. Priority: Auth -> UID doc -> Email doc
+            // The UID doc usually only has the fcm token and notifications.
+            // The Email doc usually has manually assigned roles or phone numbers.
+            const mergedFData = { ...byEmail, ...fData };
 
             const subData = subscriptions[emailLower];
 
@@ -62,15 +64,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
 
             combinedList.push({
-                id: fData.id || authUser.uid,
+                id: mergedFData.id || authUser.uid,
                 userId: authUser.uid,
                 email: authUser.email,
-                name: authUser.displayName || fData.name || "Sin Nombre",
-                phone: authUser.phoneNumber || fData.phone || "",
-                rol: fData.rol || "user",
-                signalNotification: fData.signalNotification ?? true,
-                messageNotification: fData.messageNotification ?? true,
-                videoNotification: fData.videoNotification ?? true,
+                name: authUser.displayName || mergedFData.name || "Sin Nombre",
+                phone: authUser.phoneNumber || mergedFData.phone || "",
+                rol: mergedFData.rol || "user",
+                signalNotification: mergedFData.signalNotification === undefined ? true : Boolean(mergedFData.signalNotification),
+                messageNotification: mergedFData.messageNotification === undefined ? true : Boolean(mergedFData.messageNotification),
+                videoNotification: mergedFData.videoNotification === undefined ? true : Boolean(mergedFData.videoNotification),
                 subscriptionId: subData?.id,
                 endDate: endISO,
                 createdAt: authUser.metadata.creationTime,
