@@ -83,11 +83,13 @@ export const FormSignal = ({ onClose, open, initialData }: FormSignalProps) => {
   };
 
   const validateForm = () => {
-    const areAllFieldsValid = Object.values(values).every(
-      (field) => field.trim() !== ""
-    );
+    const isAssetValid = values.assetInput === 'Otro' ? values.customAsset.trim() !== "" : values.assetInput.trim() !== "";
+    const isActionValid = values.action.trim() !== "";
+    const isEntryPriceValid = values.entryPrice.trim() !== "";
+    const isOrderTypeValid = values.orderType.trim() !== "";
+    const isStatusValid = values.status.trim() !== "";
 
-    return areAllFieldsValid;
+    return isAssetValid && isActionValid && isEntryPriceValid && isOrderTypeValid && isStatusValid;
   };
   const handleImagenChange = (event: any) => {
     const file = event.target.files[0];
