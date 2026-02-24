@@ -141,7 +141,7 @@ export function TableSignals() {
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <Box>
                       <Typography sx={{ color: '#FFFFFF', fontSize: 20, fontWeight: 700, lineHeight: 1.2, letterSpacing: '-0.02em' }}>
-                        {signal.defaultCurrency?.toUpperCase()}/{signal.currency?.toUpperCase() || signal.defaultCurrency}
+                        {signal.defaultCurrency?.toUpperCase()}{signal.currency ? `/${signal.currency.toUpperCase()}` : ''}
                       </Typography>
                       <Typography sx={{ color: '#9CA3AF', fontSize: 13, fontWeight: 500, mt: 0.5 }}>
                         {signal.action?.toUpperCase()} <span style={{ opacity: 0.5, margin: '0 4px' }}>•</span> {signal.stopLossPips || '--'} Pip SL
