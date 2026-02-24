@@ -21,21 +21,36 @@ const sendNotification = async (req: NextApiRequest, res: NextApiResponse<any>) 
     await admin.messaging().send({
       topic: topic,
       notification: {
-        title,
-        body,
+        title: title || "Nueva Notificación",
+        body: body || "Abre la aplicación para ver más detalles",
       },
-      // Configuración Explicita para que SUENE en Android
+      // Configuración Explicita para alta prioridad en Android
       android: {
         priority: 'high',
-        notification: { sound: 'default', channelId: 'default', defaultSound: true, priority: 'high' }
+        notification: {
+          sound: 'default',
+          channelId: 'default',
+          defaultSound: true,
+          priority: 'max'
+        }
       },
-      // Configuración Explicita para que SUENE en iOS
+      // Configuración Explicita, Irrompible y Estandarizada para Apple (iOS)
       apns: {
         headers: {
-          'apns-priority': '10',
+          'apns-priority': '10', // 10 = Entrega INMEDIATA (Requiere interacción usuario)
+          'apns-push-type': 'alert'
         },
         payload: {
-          aps: { sound: 'default' }
+          aps: {
+            alert: {
+              title: title,
+              body: body
+            },
+            sound: 'default',
+            badge: 1,
+            contentAvailable: true, // Wakes up the app in background
+            mutableContent: true    // Allows Notification Service Extension (Rich Media)
+          }
         }
       }
     });
