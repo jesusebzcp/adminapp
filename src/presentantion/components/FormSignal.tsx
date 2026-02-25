@@ -161,6 +161,8 @@ export const FormSignal = ({ onClose, open, initialData }: FormSignalProps) => {
           title: `Tenemos un nuevo análisis para ti ${titleSymbol}`,
           body: "🚀",
           topic: "client",
+          type: "signal",
+          data: { asset: titleSymbol }
         };
         await axios.post("/api/sendNotification", not);
         await setDoc(doc(notificationRef, finalId), {

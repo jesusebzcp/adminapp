@@ -14,15 +14,28 @@ const sendNotification = async (req: NextApiRequest, res: NextApiResponse<any>) 
   }
 
   try {
-    const { topic, title, body } = req.body;
+    const { topic, title, body, type, data } = req.body;
 
-    console.log(`Sending broad topic-based notification to: ${topic}`);
+    let finalTitle = title || "Nueva Notificación";
+    let finalBody = body || "Abre la aplicación para ver más detalles";
+
+    // Centralized Phrase Logic (Vercel Source of Truth)
+    if (type === 'signal') {
+      const assetStr = data?.asset ? ` en ${data.asset}` : '';
+      finalTitle = `🎯 Nueva Operación Oficial${assetStr}`;
+      finalBody = "Abre la aplicación para ver los parámetros detallados.";
+    } else if (type === 'news') {
+      finalTitle = `📰 Actualización de Mercado IA369`;
+      finalBody = "Revisa las últimas noticias y análisis en tu portal.";
+    }
+
+    console.log(`Sending broad topic-based notification to: ${topic} - Title: ${finalTitle}`);
 
     await admin.messaging().send({
       topic: topic,
       notification: {
-        title: title || "Nueva Notificación",
-        body: body || "Abre la aplicación para ver más detalles",
+        title: finalTitle,
+        body: finalBody,
       },
       // Configuración Explicita para alta prioridad en Android
       android: {
@@ -43,8 +56,8 @@ const sendNotification = async (req: NextApiRequest, res: NextApiResponse<any>) 
         payload: {
           aps: {
             alert: {
-              title: title,
-              body: body
+              title: finalTitle,
+              body: finalBody
             },
             sound: 'default',
             badge: 1,

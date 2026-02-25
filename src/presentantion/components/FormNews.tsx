@@ -117,10 +117,11 @@ export const FormNews = ({ onClose, open, initialData }: FormNewsProps) => {
 
             // If we are creating, send notification to client topic
             if (!initialData?.id) {
-                const not = {
+                const not: any = {
                     title: `Nueva Noticia de ${docData.author}`,
                     body: docData.message.length > 30 ? docData.message.substring(0, 30) + '...' : docData.message,
                     topic: "client",
+                    type: "news",
                 };
                 // Fire Push Notification to Native Apps
                 await axios.post("/api/sendNotification", not);
