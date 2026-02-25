@@ -21,12 +21,20 @@ const sendNotification = async (req: NextApiRequest, res: NextApiResponse<any>) 
 
     // Centralized Phrase Logic (Vercel Source of Truth)
     if (type === 'signal') {
-      const assetStr = data?.asset ? ` en ${data.asset}` : '';
-      finalTitle = `🎯 Nueva Operación Oficial${assetStr}`;
-      finalBody = "Abre la aplicación para ver los parámetros detallados.";
+      const assetStr = data?.asset ? ` ${data.asset}` : '';
+      const actionRaw = data?.action?.toLowerCase() || '';
+
+      // Determine if it's Buy or Sell based on the action string ("buy", "sell", "compra", "venta")
+      let actionText = "Operación en";
+      if (['buy', 'compra', 'comprar'].includes(actionRaw)) actionText = "Compra";
+      if (['sell', 'venta', 'vender'].includes(actionRaw)) actionText = "Venta";
+
+      finalTitle = `Tenemos un nuevo Análisis 🎯`;
+      finalBody = `${actionText}${assetStr}, activala !`;
+
     } else if (type === 'news') {
-      finalTitle = `📰 Actualización de Mercado IA369`;
-      finalBody = "Revisa las últimas noticias y análisis en tu portal.";
+      finalTitle = `Nueva actualización 📰`;
+      finalBody = "No te lo pierdas, mirala ahora!";
     }
 
     console.log(`Sending broad topic-based notification to: ${topic} - Title: ${finalTitle}`);

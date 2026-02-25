@@ -158,11 +158,11 @@ export const FormSignal = ({ onClose, open, initialData }: FormSignalProps) => {
       if (!initialData?.id) {
         const titleSymbol = docData.currency ? `${docData.defaultCurrency}/${docData.currency}` : docData.defaultCurrency;
         const not = {
-          title: `Tenemos un nuevo análisis para ti ${titleSymbol}`,
+          title: `Tenemos un nuevo Análisis 🎯`,
           body: "🚀",
           topic: "client",
           type: "signal",
-          data: { asset: titleSymbol }
+          data: { asset: titleSymbol, action: docData.action }
         };
         await axios.post("/api/sendNotification", not);
         await setDoc(doc(notificationRef, finalId), {
