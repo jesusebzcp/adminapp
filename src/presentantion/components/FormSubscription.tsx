@@ -17,6 +17,7 @@ import {
     Switch,
     FormControlLabel,
     Divider,
+    CircularProgress,
 } from "@mui/material";
 import PhoneIcon from '@mui/icons-material/Phone';
 import {
@@ -53,6 +54,7 @@ export const FormSubscription = ({ onClose, open, initialData, onRefresh }: Form
         messageNotification: true,
         videoNotification: true,
         endDate: dayjs().add(30, 'day').format("YYYY-MM-DD"),
+        newPassword: "", // New state variable
     });
     const [loading, setLoading] = useState(false);
 
@@ -72,6 +74,7 @@ export const FormSubscription = ({ onClose, open, initialData, onRefresh }: Form
                     messageNotification: initialData.messageNotification ?? true,
                     videoNotification: initialData.videoNotification ?? true,
                     endDate: initialData.endDate ? dayjs(initialData.endDate).format("YYYY-MM-DD") : dayjs().add(30, 'day').format("YYYY-MM-DD"),
+                    newPassword: "",
                 });
             } else {
                 setValues({
@@ -83,6 +86,7 @@ export const FormSubscription = ({ onClose, open, initialData, onRefresh }: Form
                     messageNotification: true,
                     videoNotification: true,
                     endDate: dayjs().add(30, 'day').format("YYYY-MM-DD"),
+                    newPassword: "",
                 });
             }
         }
@@ -141,6 +145,26 @@ export const FormSubscription = ({ onClose, open, initialData, onRefresh }: Form
                 if (isEditing && initialData?.subscriptionId && !initialData.subscriptionId.startsWith("mock-")) {
                     await deleteDoc(doc(db, "subscription", initialData.subscriptionId));
                 }
+            }
+
+            // 3. SET OR UPDATE PASSWORD
+            if (values.newPassword && values.newPassword.trim() !== "") {
+                const response = await fetch("/api/updatePassword", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email: emailKey,
+                        newPassword: values.newPassword.trim(),
+                    }),
+                });
+
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || "Error al actualizar la contraseña");
+                }
+                toast.success("Contraseña actualizada correctamente");
             }
 
             toast.success(isEditing ? "Perfil CRM actualizado" : "Cliente agregado correctamente");
@@ -205,6 +229,20 @@ export const FormSubscription = ({ onClose, open, initialData, onRefresh }: Form
                             />
                         </Box>
                     )}
+
+                    <Divider sx={{ mb: 3 }} />
+
+                    <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>Credenciales de Acceso</Typography>
+                    <Box sx={{ mb: 3 }}>
+                        <TextField
+                            fullWidth
+                            label={isEditing ? "Nueva Contraseña (Opcional)" : "Contraseña"}
+                            type="password"
+                            value={values.newPassword}
+                            onChange={(e) => onChange("newPassword", e.target.value)}
+                            helperText={isEditing ? "Deja en blanco si no deseas cambiarla. Mínimo 6 caracteres." : "Requerida si deseas que el usuario pueda iniciar sesión con correo y contraseña. Mínimo 6 caracteres."}
+                        />
+                    </Box>
 
                     <Divider sx={{ mb: 3 }} />
 
