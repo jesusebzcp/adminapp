@@ -48,7 +48,7 @@ type FormSignalProps = {
   initialData?: typeof initialState & { id?: string; image?: string; graphImage?: string };
 };
 
-const typeOrder = ["Sell Stop", "Buy Stop", "Sell Limit", "Buy Limit"];
+const typeOrder = ["Sell Stop", "Buy Stop", "Sell Limit", "Buy Limit", "Ejecución por mercado"];
 export const typeStatus = ["Activa", "Pendiente", "Descartada"];
 
 export const initialState = {
