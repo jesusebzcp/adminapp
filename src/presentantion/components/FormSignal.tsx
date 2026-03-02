@@ -287,29 +287,29 @@ export const FormSignal = ({ onClose, open, initialData }: FormSignalProps) => {
 
           <TextField
             fullWidth
-            type="number"
             label="Precio de entrada"
             value={values.entryPrice}
             onChange={(e) => onChange("entryPrice", e.target.value)}
             InputLabelProps={{ shrink: true }}
+            inputMode="decimal"
           />
 
           <TextField
             fullWidth
-            type="number"
             label="Stop loss"
             value={values.stopLoss}
             onChange={(e) => onChange("stopLoss", e.target.value)}
             InputLabelProps={{ shrink: true }}
+            inputMode="decimal"
           />
 
           <TextField
             fullWidth
-            type="number"
             label="Take profit"
             value={values.takeProfit}
             onChange={(e) => onChange("takeProfit", e.target.value)}
             InputLabelProps={{ shrink: true }}
+            inputMode="decimal"
           />
 
           <TextField
@@ -322,11 +322,11 @@ export const FormSignal = ({ onClose, open, initialData }: FormSignalProps) => {
 
           <TextField
             fullWidth
-            type="number"
             label="Pips de Stop Loss"
             value={values.stopLossPips}
             onChange={(e) => onChange("stopLossPips", e.target.value)}
             InputLabelProps={{ shrink: true }}
+            inputMode="decimal"
           />
 
           <TextField
