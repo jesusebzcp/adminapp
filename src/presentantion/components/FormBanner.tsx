@@ -13,6 +13,10 @@ import {
     Typography,
     Switch,
     FormControlLabel,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
 } from "@mui/material";
 import {
     addDoc,
@@ -46,6 +50,8 @@ type FormBannerProps = {
 
 export const initialState = {
     actionUrl: "",
+    destinationType: "url", // 'url' or 'screen'
+    targetScreen: "", // 'HOME', 'SIGNALS', 'VIDEOS', 'CALCULATOR', 'NEWS'
     order: 0,
     isActive: true,
 };
@@ -57,7 +63,11 @@ export const FormBanner = ({ onClose, open, initialData, onSuccess }: FormBanner
 
     useEffect(() => {
         if (open) {
-            setValues(initialData || initialState);
+            setValues({
+                 ...initialState,
+                 ...initialData,
+                 destinationType: initialData?.targetScreen ? "screen" : "url"
+            });
             setImageBase64(undefined);
         }
     }, [open, initialData]);
@@ -84,7 +94,9 @@ export const FormBanner = ({ onClose, open, initialData, onSuccess }: FormBanner
             setLoading(true);
 
             const docData: any = {
-                actionUrl: values.actionUrl,
+                actionUrl: values.destinationType === 'url' ? values.actionUrl : "",
+                targetScreen: values.destinationType === 'screen' ? values.targetScreen : "",
+                destinationType: values.destinationType,
                 order: Number(values.order),
                 isActive: values.isActive,
             };
@@ -168,14 +180,46 @@ export const FormBanner = ({ onClose, open, initialData, onSuccess }: FormBanner
                         />
                     </Button>
 
-                    <TextField
-                        fullWidth
-                        label="Enlace de acción (URL) Opcional"
-                        placeholder="https://pay.hotmart.com/..."
-                        value={values.actionUrl}
-                        onChange={(e) => onChange("actionUrl", e.target.value)}
-                        InputLabelProps={{ shrink: true }}
-                    />
+                    <FormControl fullWidth>
+                        <InputLabel id="destination-type-label">Tipo de Acción</InputLabel>
+                        <Select
+                            labelId="destination-type-label"
+                            value={values.destinationType || 'url'}
+                            label="Tipo de Acción"
+                            onChange={(e) => onChange("destinationType", e.target.value)}
+                        >
+                            <MenuItem value="url">Abrir Sitio Web (Link Externo)</MenuItem>
+                            <MenuItem value="screen">Navegar en la App (Pantalla Interna)</MenuItem>
+                        </Select>
+                    </FormControl>
+
+                    {values.destinationType === 'url' ? (
+                        <TextField
+                            fullWidth
+                            label="Enlace de acción (URL) Opcional"
+                            placeholder="https://pay.hotmart.com/..."
+                            value={values.actionUrl}
+                            onChange={(e) => onChange("actionUrl", e.target.value)}
+                            InputLabelProps={{ shrink: true }}
+                        />
+                    ) : (
+                        <FormControl fullWidth>
+                            <InputLabel id="target-screen-label">Pantalla de la App</InputLabel>
+                            <Select
+                                labelId="target-screen-label"
+                                value={values.targetScreen || ''}
+                                label="Pantalla de la App"
+                                onChange={(e) => onChange("targetScreen", e.target.value)}
+                            >
+                                <MenuItem value="">-- Ninguna --</MenuItem>
+                                <MenuItem value="HOME">Inicio (Home)</MenuItem>
+                                <MenuItem value="SIGNALS">Casos de mercado (Señales)</MenuItem>
+                                <MenuItem value="VIDEOS">Inicia Aquí (Videos)</MenuItem>
+                                <MenuItem value="CALCULATOR">Calculadora de Riesgo</MenuItem>
+                                <MenuItem value="NEWS">Noticias</MenuItem>
+                            </Select>
+                        </FormControl>
+                    )}
 
                     <TextField
                         fullWidth
