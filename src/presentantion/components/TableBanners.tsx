@@ -33,6 +33,7 @@ export function TableBanners({ refreshTrigger }: TableBannersProps) {
         if (refreshTrigger > 0) {
             getBanners();
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [refreshTrigger]);
 
     const confirmDelete = () => {
@@ -59,7 +60,7 @@ export function TableBanners({ refreshTrigger }: TableBannersProps) {
                         <ViewCarouselIcon sx={{ fontSize: 64, color: 'rgba(255,255,255,0.1)', mb: 2 }} />
                         <Typography variant="h6" color="textSecondary">No hay banners configurados</Typography>
                         <Typography variant="body2" color="textSecondary" sx={{ mt: 1, textAlign: 'center', maxWidth: 400 }}>
-                            Estos banners aparecerán en la pantalla de inicio de la app móvil "Inicia aquí". Puedes usarlos para promociones o anuncios importantes.
+                            Estos banners aparecerán en la pantalla de inicio de la app móvil &quot;Inicia aquí&quot;. Puedes usarlos para promociones o anuncios importantes.
                         </Typography>
                     </Box>
                 ) : (
